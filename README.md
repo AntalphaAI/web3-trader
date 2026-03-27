@@ -1,65 +1,155 @@
-# 🔄 Web3 Trader Skill v1.0.0
+# 🔄 Web3 Trader Skill v1.0.2
 
-> **AI Agent 原生 DEX 交易工具 | 零托管 | 四大钱包 | 赛博朋克 UI**
+> **AI-Native DEX Trading Tool | Zero Custody | Multi-Wallet | Cyberpunk UI**
 >
-> 由 Antalpha AI 提供聚合交易支持
+> Powered by Antalpha AI DEX Aggregator
 
 ---
 
-## 功能
+## Features
 
-- 💱 通过 Antalpha AI DEX 聚合器查询实时价格和最优路由
-- 🌐 生成赛博朋克风格 Swap 托管页（Matrix 数字雨 + 扫描线动效）
-- 📱 支持四大主流钱包：MetaMask、OKX Web3、Trust Wallet、TokenPocket
-- ⚡ 钱包内置浏览器打开后自动弹出签名（2s 倒计时）
-- 📷 自动生成 QR 码图片（青色码点 + 深色背景）
-- 🔒 零托管 — 私钥永远不离开用户钱包
+- 💱 Real-time DEX quotes and optimal routing via Antalpha AI Aggregator
+- 🌐 Cyberpunk-style swap pages (Matrix rain animation + scanline effects)
+- 📱 4 major wallets: MetaMask, OKX Web3, Trust Wallet, TokenPocket
+- ⚡ Auto-execute in wallet dApp browser (2s countdown → direct signature popup)
+- 📷 QR code generation with cyberpunk theme (cyan dots on dark background)
+- 🔒 Zero custody — private keys never leave the user's wallet
+- 🤖 MCP remote mode — one `swap-full` call does quote + page hosting
 
-## 快速开始
+## Architecture
+
+```
+┌──────────────┐    MCP JSON-RPC    ┌──────────────────────────────┐
+│  AI Agent    │ ──────────────────► │  Antalpha MCP Server          │
+│  (OpenClaw)  │  swap-full          │  mcp-skills.ai.antalpha.com   │
+│              │ ◄────────────────── │                                │
+│              │  quote + preview_url │  ├─ 0x API ── DEX Aggregation │
+└──────┬───────┘                     │  ├─ Page Gen ── Cyberpunk HTML │
+       │                             │  └─ Hosting ── URL + QR        │
+       │  send preview_url + QR      └────────────────────────────────┘
+       ▼
+┌──────────────┐   click/scan    ┌────────────────────┐
+│  User        │ ──────────────► │  Hosted Swap Page   │
+│  (mobile/PC) │                 │  (Cyberpunk UI)     │
+└──────────────┘                 └────────┬───────────┘
+                                          │ eth_sendTransaction
+                                          ▼
+                                 ┌────────────────────┐
+                                 │  Wallet App         │
+                                 │  Sign & Broadcast   │
+                                 └────────────────────┘
+```
+
+## Quick Start
+
+### MCP Remote Mode (Recommended)
+
+No local setup needed. The AI agent calls the Antalpha MCP Server directly:
+
+```
+MCP Server: https://mcp-skills.ai.antalpha.com/mcp
+```
+
+Available MCP Tools:
+
+| Tool | Description |
+|------|-------------|
+| `swap-full` | **One-shot**: quote + generate page + host → returns URL + QR |
+| `swap-quote` | Get DEX aggregated quote |
+| `swap-create-page` | Generate and host a cyberpunk swap page |
+| `swap-tokens` | List supported tokens |
+| `swap-gas` | Current gas price |
+
+### Local CLI Mode (Fallback)
 
 ```bash
-# 安装依赖
+# Install dependencies
 pip install requests web3 qrcode pillow
 
-# 配置 API key
+# Configure API key
 cp references/config.example.yaml ~/.web3-trader/config.yaml
 
-# 查询价格
-python3 scripts/trader_cli.py price --from ETH --to USDT --amount 0.001
+# Query price
+python3 scripts/trader_cli.py price --from ETH --to USDT --amount 0.1
 
-# 生成 Swap 页面
-python3 scripts/trader_cli.py swap-page --from ETH --to USDT --amount 0.001 \
+# Generate swap page
+python3 scripts/trader_cli.py swap-page --from ETH --to USDT --amount 0.1 \
   --wallet 0xYourAddress -o swap.html --json
 ```
 
-## 文件结构
+## Supported Tokens (Ethereum Mainnet)
+
+| Category | Tokens |
+|----------|--------|
+| Stablecoins | USDT, USDC, DAI |
+| Native/Wrapped | ETH, WETH, WBTC |
+| DeFi | LINK, UNI |
+
+## Supported Wallets
+
+| Wallet | Deeplink Protocol | Status |
+|--------|-------------------|--------|
+| 🦊 MetaMask | `metamask.app.link/dapp/` | ✅ Verified |
+| 💎 OKX Web3 | `okx://wallet/dapp/details` | ✅ Verified |
+| 🛡️ Trust Wallet | `link.trustwallet.com/open_url` | ✅ Verified |
+| 📱 TokenPocket | `tpdapp://open` | ✅ Verified |
+
+## Project Structure
 
 ```
-├── SKILL.md                 # 完整 Skill 说明（Agent 读取）
-├── MCP_REQUIREMENTS.md      # Antalpha MCP 服务需求文档
-├── README.md                # 本文件
-├── requirements.txt         # Python 依赖
+├── SKILL.md                 # Full skill spec (read by AI agent)
+├── MCP_REQUIREMENTS.md      # MCP server requirements doc
+├── DEPLOYMENT.md            # Server deployment guide
+├── README.md                # This file
+├── requirements.txt         # Python dependencies
 ├── scripts/
-│   ├── trader_cli.py        # CLI 主入口
-│   ├── zeroex_client.py     # Antalpha AI API 客户端
-│   └── swap_page_gen.py     # 赛博朋克 Swap 页面生成器
+│   ├── trader_cli.py        # CLI entry point
+│   ├── zeroex_client.py     # Antalpha AI API client
+│   └── swap_page_gen.py     # Cyberpunk swap page generator
 ├── references/
-│   └── config.example.yaml  # 配置模板
+│   ├── config.example.yaml  # Config template
+│   ├── SECURITY.md          # Security documentation
+│   └── ANTALPHA_MCP_SERVER_SPEC.md
+├── examples/
+│   └── swap_usdt_eth.py     # Example script
 └── tests/
     └── test_zeroex_client.py
 ```
 
-## 支持的 Token
+## Security
 
-ETH, WETH, WBTC, USDT, USDC, DAI, LINK, UNI（Ethereum Mainnet）
+| Layer | Protection |
+|-------|-----------|
+| Private Keys | **Zero contact** — skill never holds, transmits, or stores any private key |
+| Transaction Data | Generated by 0x Protocol with MEV protection (anti-sandwich) |
+| Slippage | Configurable max slippage (default 0.5%), `minBuyAmount` enforced on-chain |
+| Review | User sees full transaction details in wallet before signing |
+| Swap Pages | Self-contained HTML, no backend communication, no cookies, no tracking |
 
-## 安全
+## Changelog
 
-- 仅生成交易数据，不接触私钥
-- 含 MEV 保护（anti-sandwich）
-- 可配置最大滑点（默认 0.5%）
-- 用户在钱包中审核后才签名
+### v1.0.2 (2026-03-27)
+- Agent behavior: no verbose output, only swap preview + QR code image
+- QR code generated from MCP `preview_url` and sent as image attachment
+- Updated message template with routing info
+
+### v1.0.1 (2026-03-27)
+- Antalpha MCP Server integration (`mcp-skills.ai.antalpha.com/mcp`)
+- `swap-full` one-shot: quote + page generation + server hosting
+- Swap pages hosted on trusted Antalpha domain
+- Agent no longer needs local 0x API key
+
+### v1.0.0 (2026-03-27)
+- Cyberpunk swap pages (Matrix rain + scanline effects)
+- 4 wallet support: MetaMask, OKX Web3, Trust Wallet, TokenPocket
+- Auto-execute in wallet dApp browser (2s countdown)
+- QR code generation (cyan on dark theme)
+- Full CLI toolchain (price/route/build-tx/export/swap-page/gas/tokens)
 
 ## License
 
 MIT
+
+---
+
+*Powered by Antalpha AI*
