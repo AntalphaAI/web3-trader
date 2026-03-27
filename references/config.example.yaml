@@ -1,0 +1,29 @@
+# Web3 Trader Configuration
+# Copy to ~/.web3-trader/config.yaml and fill in your API key
+
+# API Keys (required)
+api_keys:
+  zeroex: "YOUR_0X_API_KEY"  # Get from https://0x.org/dashboard
+
+# Chain Configuration
+chains:
+  default: ethereum
+  # Supported: ethereum (mainnet)
+  # P1 will add: arbitrum, optimism, base
+
+# Risk Management
+risk:
+  max_slippage: 0.5        # Maximum slippage percentage (0.5 = 0.5%)
+  max_amount_usdt: 10000   # Maximum single trade amount in USDT
+  
+# Gas Configuration
+gas:
+  strategy: standard       # fast | standard | slow
+  # fast: priorityFee = 2x average
+  # standard: priorityFee = 1x average  
+  # slow: priorityFee = 0.5x average (may be delayed)
+
+# Logging
+logging:
+  enabled: true
+  path: ~/.web3-trader/tx_log.jsonl
