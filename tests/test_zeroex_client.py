@@ -74,7 +74,7 @@ class TestIntegration(unittest.TestCase):
     def test_get_quote(self):
         """Test quote with transaction data"""
         client = ZeroExClient(api_key=os.environ["ZEROEX_API_KEY"])
-        result = client.get_quote("USDT", "ETH", 100, wallet_address="0x0000000000000000000000000000000000000001")
+        result = client.get_quote("USDT", "ETH", 100, taker="0x0000000000000000000000000000000000000001")
         
         self.assertIn("tx", result)
         self.assertIn("to", result["tx"])

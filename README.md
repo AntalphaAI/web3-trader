@@ -1,4 +1,4 @@
-# 🔄 Web3 Trader Skill v1.0.3
+# 🔄 Web3 Trader Skill v1.0.4
 
 > **AI-Native DEX Trading Tool | Zero Custody | Multi-Wallet | Cyberpunk UI**
 >
@@ -127,6 +127,18 @@ python3 scripts/trader_cli.py swap-page --from ETH --to USDT --amount 0.1 \
 | Swap Pages | Self-contained HTML, no backend communication, no cookies, no tracking |
 
 ## Changelog
+
+### v1.0.4 (2026-03-28)
+- **[P0]** Fix `examples/` and `tests/` using wrong parameter names (`wallet_address`/`slippage` → `taker`)
+- **[P0]** Fix XSS vulnerability in `swap_page_gen.py` — all user-controlled data now escaped via `html.escape()`
+- **[P0]** Remove auto-execute in dApp browser — users must explicitly click to confirm swap
+- **[P1]** Add `timeout=30s` to all HTTP requests to prevent infinite hangs
+- **[P1]** Preserve exception info in `get_gas_info()` error handling
+- **[P1]** Add error handling for file write in `cmd_swap_page`
+- **[P1]** Add missing `pyyaml` to `requirements.txt`
+- **[P2]** Use `Decimal` for amount calculations instead of `float`
+- **[P2]** Deduplicate `get_token_address` (alias to `_resolve_token`) and extract shared logic in `cmd_price`/`cmd_route`
+- **[P2]** Fix HTML `lang="zh"` → `lang="en"`
 
 ### v1.0.3 (2026-03-28)
 - Fix: `metadata` changed from multi-line YAML to single-line JSON (OpenClaw parser requirement)

@@ -1,6 +1,6 @@
 ---
 name: web3-trader
-version: 1.0.3
+version: 1.0.4
 description: DEX swap 交易技能。当用户提到 swap、兑换、卖出、买入、换成 USDT、交易 ETH、DEX 交易、代币兑换、token swap、sell ETH、buy USDT、交易代币等关键词时激活。通过 Antalpha AI DEX 聚合器查询价格、获取最优路由、生成交易数据。支持 MetaMask/OKX/Trust/TokenPocket 四大钱包。零托管，私钥不离开用户钱包。
 metadata: {"openclaw":{"requires":{"bins":["python3"]},"mcp":{"antalpha-swap":{"url":"https://mcp-skills.ai.antalpha.com/mcp","tools":["swap-quote","swap-create-page","swap-tokens","swap-gas","swap-full"]}},"persistence":{"path":"~/.web3-trader/"},"security_notes":["本 Skill 仅生成交易数据，绝不接触私钥","用户必须在自己的钱包中审核并签名交易","交易涉及风险（滑点、Gas 波动）— 请只用闲钱交易"]}}
 ---
@@ -358,6 +358,18 @@ web3-trader/
 ```
 
 ## 版本历史
+
+### v1.0.4 (2026-03-28)
+- ✅ **[P0] 修复 examples/tests 参数名错误**：`wallet_address`/`slippage` → `taker`，与 `get_quote()` 签名一致
+- ✅ **[P0] 修复 XSS 漏洞**：swap_page_gen.py 所有用户可控数据经 `html.escape()` 转义后再注入 HTML
+- ✅ **[P0] 移除自动执行交易**：dApp 浏览器不再 2s 倒计时后自动调用 `doSwap()`，必须用户手动点击确认
+- ✅ **[P1] HTTP 请求超时**：所有 `requests.get()` 增加 `timeout=30s`，防止网络故障无限挂起
+- ✅ **[P1] 异常信息保留**：`get_gas_info()` 的 `except Exception as exc` 保留原始错误信息
+- ✅ **[P1] 文件写入错误处理**：`cmd_swap_page` 的文件写入增加 try/except + stderr 输出
+- ✅ **[P1] 补充 pyyaml 依赖**：requirements.txt 新增 `pyyaml>=6.0`
+- ✅ **[P2] 浮点精度**：金额解析从 `float()` 改为 `Decimal()`，避免精度丢失
+- ✅ **[P2] 消除重复代码**：`get_token_address` 改为 `_resolve_token` 的别名；`cmd_price`/`cmd_route` 提取公共逻辑
+- ✅ **[P2] HTML lang**：`lang="zh"` → `lang="en"`
 
 ### v1.0.3 (2026-03-28)
 - ✅ **修复技能注册失败**：metadata 从多行 YAML 改为 single-line JSON（符合 OpenClaw 解析要求）

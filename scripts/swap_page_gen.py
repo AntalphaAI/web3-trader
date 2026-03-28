@@ -15,6 +15,7 @@ Usage:
     html = generate_swap_page(tx_data, quote_data, hosted_url="https://...")
 """
 
+import html as html_mod
 import json
 import base64
 import io
@@ -84,17 +85,24 @@ def generate_swap_page(
     from_token = quote.get("from_token", "")
     to_token = quote.get("to_token", "")
 
+    # HTML-escape all user-controlled values to prevent XSS
+    _e = html_mod.escape
+    wallet_short = _e(str(wallet_short))
+    from_token = _e(str(from_token))
+    to_token = _e(str(to_token))
+    hosted_url_safe = _e(str(hosted_url)) if hosted_url else ""
+
     qr_section = ""
     if qr_data_uri:
         qr_section = f'''
     <div class="qr-section">
       <div class="qr-label">[ SCAN TO OPEN ]</div>
       <img class="qr-img" src="{qr_data_uri}" alt="QR Code" />
-      <div class="qr-url">{hosted_url}</div>
+      <div class="qr-url">{hosted_url_safe}</div>
     </div>'''
 
     return f'''<!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
@@ -306,17 +314,11 @@ const pageUrl=window.location.href;
 const rawUrl=pageUrl.replace(/^https?:\\/\\//,"");
 
 if(hasDapp){{
-  // In dApp browser (MetaMask/OKX/Trust/TP internal browser)
-  // Auto-execute swap after brief delay so user can see details
+  // In dApp browser — require explicit user confirmation (no auto-execute)
   document.getElementById("dappMode").style.display="block";
   const btn=document.getElementById("confirmBtn");
-  btn.textContent="⏳ AUTO-EXECUTING IN 2s...";
-  btn.disabled=true;
-  setTimeout(()=>{{
-    btn.disabled=false;
-    btn.textContent="⚡ CONFIRM SWAP";
-    doSwap();
-  }},2000);
+  btn.textContent="⚡ CONFIRM SWAP";
+  btn.disabled=false;
 }}else{{
   document.getElementById("walletMode").style.display="block";
   // MetaMask deeplink

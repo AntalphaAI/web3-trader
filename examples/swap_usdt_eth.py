@@ -31,8 +31,7 @@ def main():
     print("🛣️  Getting optimal route...\n")
     quote = client.get_quote(
         "USDT", "ETH", 1000,
-        slippage=0.5,
-        wallet_address="0x0000000000000000000000000000000000000001"  # Replace with your wallet
+        taker="0x0000000000000000000000000000000000000001"  # Replace with your wallet
     )
     
     print(f"   Guaranteed Price: {quote['guaranteed_price']}")

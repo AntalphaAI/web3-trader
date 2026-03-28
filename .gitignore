@@ -140,3 +140,4 @@ vite.config.ts.timestamp-*
 
 # Internal team docs (not for public release)
 .internal/
+__pycache__/

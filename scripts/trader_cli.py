@@ -21,75 +21,73 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from zeroex_client import create_client, TOKENS
 
 
-def cmd_price(args):
-    """Query token price"""
+def _fetch_price(args):
+    """Shared helper: fetch price data from API."""
     client = create_client()
-    result = client.get_price(
+    return client.get_price(
         from_token=args.from_token,
         to_token=args.to_token,
         amount=args.amount,
     )
-    
+
+
+def _print_price_summary(result, title="💱 Price Quote"):
+    """Print common price/route summary lines."""
+    print(f"\n{title}")
+    print(f"   {result['from_amount']:,.2f} {result['from_token']} → {result['to_amount']:,.6f} {result['to_token']}")
+    print(f"   Price: 1 {result['from_token']} = {result['price']:,.8f} {result['to_token']}")
+    print(f"   Min Buy: {result['min_buy_amount']:,.6f} {result['to_token']}")
+    print(f"   Gas: ~{result['gas']:,} ({float(result['gas_price_wei'])/1e9:.2f} Gwei)")
+
+
+def _print_route_details(result):
+    """Print route fills, tokens, and fee details."""
+    route = result.get("route", {})
+    fills = route.get("fills", [])
+    tokens = route.get("tokens", [])
+
+    if fills:
+        print(f"\n   Route Sources:")
+        for fill in fills:
+            bps = int(fill.get("proportionBps", 0))
+            print(f"     • {fill.get('source', 'Unknown')}: {bps/100:.1f}%")
+
+    if tokens:
+        print(f"\n   Tokens in Route:")
+        for t in tokens:
+            print(f"     • {t.get('symbol', 'Unknown')} ({t.get('address', '')[:10]}...)")
+
+    fees = result.get("fees", {})
+    zex_fee = fees.get("zeroExFee", {})
+    if zex_fee:
+        fee_amount = int(zex_fee.get("amount", 0))
+        print(f"\n   0x Fee: {fee_amount} ({zex_fee.get('type', '')})")
+
+
+def cmd_price(args):
+    """Query token price"""
+    result = _fetch_price(args)
+
     if args.json:
         out = {k: v for k, v in result.items() if k != "raw"}
         print(json.dumps(out, indent=2, default=str))
     else:
-        print(f"\n💱 Price Quote")
-        print(f"   {result['from_amount']:,.2f} {result['from_token']} → {result['to_amount']:,.6f} {result['to_token']}")
-        print(f"   Price: 1 {result['from_token']} = {result['price']:,.8f} {result['to_token']}")
-        print(f"   Min Buy: {result['min_buy_amount']:,.6f} {result['to_token']}")
-        print(f"   Gas: ~{result['gas']:,} ({float(result['gas_price_wei'])/1e9:.2f} Gwei)")
+        _print_price_summary(result, "💱 Price Quote")
         print(f"   Liquidity: {'✅ Available' if result['liquidity_available'] else '❌ Unavailable'}")
-        
-        route = result.get("route", {})
-        fills = route.get("fills", [])
-        if fills:
-            print(f"\n   Route:")
-            for fill in fills:
-                bps = int(fill.get("proportionBps", 0))
-                print(f"     • {fill.get('source', 'Unknown')}: {bps/100:.1f}%")
+        _print_route_details(result)
         print()
 
 
 def cmd_route(args):
     """Get optimal swap route"""
-    client = create_client()
-    result = client.get_price(
-        from_token=args.from_token,
-        to_token=args.to_token,
-        amount=args.amount,
-    )
-    
+    result = _fetch_price(args)
+
     if args.json:
         out = {k: v for k, v in result.items() if k != "raw"}
         print(json.dumps(out, indent=2, default=str))
     else:
-        print(f"\n🛣️  Optimal Route")
-        print(f"   {result['from_amount']:,.2f} {result['from_token']} → {result['to_amount']:,.6f} {result['to_token']}")
-        print(f"   Price: 1 {result['from_token']} = {result['price']:,.8f} {result['to_token']}")
-        print(f"   Min Buy: {result['min_buy_amount']:,.6f} {result['to_token']}")
-        print(f"   Gas: ~{result['gas']:,} ({float(result['gas_price_wei'])/1e9:.2f} Gwei)")
-        
-        route = result.get("route", {})
-        fills = route.get("fills", [])
-        tokens = route.get("tokens", [])
-        
-        if fills:
-            print(f"\n   Route Sources:")
-            for fill in fills:
-                bps = int(fill.get("proportionBps", 0))
-                print(f"     • {fill.get('source', 'Unknown')}: {bps/100:.1f}%")
-        
-        if tokens:
-            print(f"\n   Tokens in Route:")
-            for t in tokens:
-                print(f"     • {t.get('symbol', 'Unknown')} ({t.get('address', '')[:10]}...)")
-        
-        fees = result.get("fees", {})
-        zex_fee = fees.get("zeroExFee", {})
-        if zex_fee:
-            fee_amount = int(zex_fee.get("amount", 0))
-            print(f"\n   0x Fee: {fee_amount} ({zex_fee.get('type', '')})")
+        _print_price_summary(result, "🛣️  Optimal Route")
+        _print_route_details(result)
         print()
 
 
@@ -204,8 +202,12 @@ def cmd_swap_page(args):
     
     # Determine output path
     out_path = args.output or os.path.join(os.getcwd(), "swap_page.html")
-    with open(out_path, "w") as f:
-        f.write(html)
+    try:
+        with open(out_path, "w") as f:
+            f.write(html)
+    except OSError as exc:
+        print(f"Error writing to {out_path}: {exc}", file=sys.stderr)
+        sys.exit(1)
     
     # Generate standalone QR code image if hosted URL is provided
     qr_path = None

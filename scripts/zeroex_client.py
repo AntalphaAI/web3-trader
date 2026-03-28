@@ -10,6 +10,7 @@ Headers: 0x-api-key, 0x-version: v2
 import os
 import json
 import requests
+from decimal import Decimal
 from typing import Optional, Dict, Any
 
 # Token addresses (Ethereum Mainnet)
@@ -35,10 +36,14 @@ CHAIN_IDS = {
 DEFAULT_TAKER = "0x70a9f34f9b34c64957b9c401a97bfed35b95049e"
 
 
+DEFAULT_TIMEOUT = 30  # seconds — prevent infinite hangs on network issues
+
+
 class ZeroExClient:
-    def __init__(self, api_key: str, chain_id: int = 1):
+    def __init__(self, api_key: str, chain_id: int = 1, timeout: int = DEFAULT_TIMEOUT):
         self.api_key = api_key
         self.chain_id = chain_id
+        self.timeout = timeout
         # Antalpha AI - DEX Aggregator endpoint
         # Using allowance-holder mode: native ETH sells include value in tx
         # This produces cleaner EIP-681 links than permit2 mode
@@ -62,11 +67,8 @@ class ZeroExClient:
         return TOKENS[symbol]
     
     def get_token_address(self, symbol: str) -> str:
-        """Get token address by symbol (original, not resolved)"""
-        symbol = symbol.upper()
-        if symbol not in TOKENS:
-            raise ValueError(f"Unsupported token: {symbol}. Supported: {list(TOKENS.keys())}")
-        return TOKENS[symbol]
+        """Alias for _resolve_token — get token address by symbol."""
+        return self._resolve_token(symbol)
     
     def get_price(self, from_token: str, to_token: str, amount: float,
                   taker: Optional[str] = None) -> Dict[str, Any]:
@@ -97,26 +99,26 @@ class ZeroExClient:
             "taker": taker or DEFAULT_TAKER,
         }
         
-        response = self.session.get(f"{self.base_url}/price", params=params)
+        response = self.session.get(f"{self.base_url}/price", params=params, timeout=self.timeout)
         response.raise_for_status()
         data = response.json()
         
         to_decimals = self._get_decimals(to_token)
-        buy_amount = float(data["buyAmount"]) / (10 ** to_decimals)
-        price = buy_amount / amount if amount > 0 else 0
+        buy_amount = Decimal(data["buyAmount"]) / Decimal(10 ** to_decimals)
+        price = float(buy_amount / Decimal(str(amount))) if amount > 0 else 0
         
         return {
             "from_token": from_token.upper(),
             "to_token": to_token.upper(),
             "from_amount": amount,
-            "to_amount": buy_amount,
+            "to_amount": float(buy_amount),
             "price": price,
             "gas": int(data.get("gas", 0)),
             "gas_price_wei": data.get("gasPrice", "0"),
             "route": data.get("route", {}),
             "fees": data.get("fees", {}),
             "liquidity_available": data.get("liquidityAvailable", False),
-            "min_buy_amount": float(data.get("minBuyAmount", 0)) / (10 ** to_decimals),
+            "min_buy_amount": float(Decimal(data.get("minBuyAmount", 0)) / Decimal(10 ** to_decimals)),
             "raw": data,
         }
     
@@ -152,13 +154,13 @@ class ZeroExClient:
             "taker": taker,
         }
         
-        response = self.session.get(f"{self.base_url}/quote", params=params)
+        response = self.session.get(f"{self.base_url}/quote", params=params, timeout=self.timeout)
         response.raise_for_status()
         data = response.json()
         
         to_decimals = self._get_decimals(to_token)
-        buy_amount = float(data["buyAmount"]) / (10 ** to_decimals)
-        price = buy_amount / amount if amount > 0 else 0
+        buy_amount = Decimal(data["buyAmount"]) / Decimal(10 ** to_decimals)
+        price = float(buy_amount / Decimal(str(amount))) if amount > 0 else 0
         
         # Extract transaction data
         tx = data.get("transaction", {})
@@ -167,9 +169,9 @@ class ZeroExClient:
             "from_token": from_token.upper(),
             "to_token": to_token.upper(),
             "from_amount": amount,
-            "to_amount": buy_amount,
+            "to_amount": float(buy_amount),
             "price": price,
-            "min_buy_amount": float(data.get("minBuyAmount", 0)) / (10 ** to_decimals),
+            "min_buy_amount": float(Decimal(data.get("minBuyAmount", 0)) / Decimal(10 ** to_decimals)),
             "gas": int(tx.get("gas", data.get("gas", 0))),
             "gas_price_wei": tx.get("gasPrice", data.get("gasPrice", "0")),
             "tx": {
@@ -196,7 +198,7 @@ class ZeroExClient:
                 "sellAmount": "1000000",  # 1 USDC
                 "taker": DEFAULT_TAKER,
             }
-            response = self.session.get(f"{self.base_url}/price", params=params)
+            response = self.session.get(f"{self.base_url}/price", params=params, timeout=self.timeout)
             response.raise_for_status()
             data = response.json()
             gas_price = int(data.get("gasPrice", 0))
@@ -205,12 +207,12 @@ class ZeroExClient:
                 "gas_price_gwei": gas_price / 1e9,
                 "estimated_gas": int(data.get("gas", 0)),
             }
-        except Exception:
+        except Exception as exc:
             return {
                 "gas_price_wei": 0,
                 "gas_price_gwei": 0,
                 "estimated_gas": 0,
-                "error": "Failed to fetch gas info",
+                "error": f"Failed to fetch gas info: {exc}",
             }
     
     def _get_decimals(self, token: str) -> int:
