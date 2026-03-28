@@ -1,4 +1,4 @@
-# 🔄 Web3 Trader Skill v1.0.2
+# 🔄 Web3 Trader Skill v1.0.3
 
 > **AI-Native DEX Trading Tool | Zero Custody | Multi-Wallet | Cyberpunk UI**
 >
@@ -127,6 +127,11 @@ python3 scripts/trader_cli.py swap-page --from ETH --to USDT --amount 0.1 \
 | Swap Pages | Self-contained HTML, no backend communication, no cookies, no tracking |
 
 ## Changelog
+
+### v1.0.3 (2026-03-28)
+- Fix: `metadata` changed from multi-line YAML to single-line JSON (OpenClaw parser requirement)
+- Fix: remove `ZEROEX_API_KEY` from `requires.env` (MCP mode doesn't need it; was causing load-time gating)
+- Enhance: `description` now covers swap/兑换/卖出/买入/sell/buy/DEX trigger keywords for better intent matching
 
 ### v1.0.2 (2026-03-27)
 - Agent behavior: no verbose output, only swap preview + QR code image
