@@ -1,45 +1,11 @@
 ---
 name: web3-trader
-version: 1.0.2
-description: >
-  DEX 聚合交易 Skill。通过 Antalpha AI DEX 聚合器查询价格、获取最优路由、
-  生成交易数据、创建赛博朋克风格 Swap 托管页。支持 MetaMask/OKX/Trust/TokenPocket 
-  四大主流钱包。零托管 — 私钥永远不离开用户钱包。
-  v1.0.2 优化 Agent 输出体验：砍废话只发交易预览 + QR 码图片随消息发送。
-metadata:
-  openclaw:
-    requires:
-      env:
-        - ZEROEX_API_KEY: "Antalpha AI API key — 仅本地 CLI 模式需要，MCP 模式不需要"
-      bins:
-        - python3
-      pip:
-        - requests
-        - web3
-        - qrcode
-        - pillow
-    mcp:
-      antalpha-swap:
-        url: "https://mcp-skills.ai.antalpha.com/mcp"
-        description: "Antalpha MCP Server — 远程 DEX 报价 + Swap 页面托管"
-        tools:
-          - swap-quote
-          - swap-create-page
-          - swap-tokens
-          - swap-gas
-          - swap-full
-    persistence:
-      path: ~/.web3-trader/
-      files:
-        - config.yaml: 用户配置（API key、默认链、风控参数）— 仅本地 CLI 模式
-        - tx_log.jsonl: 交易审计日志（可选）
-    security_notes:
-      - 本 Skill 仅生成交易数据，绝不接触私钥
-      - 用户必须在自己的钱包中审核并签名交易
-      - 交易涉及风险（滑点、Gas 波动）— 请只用闲钱交易
+version: 1.0.3
+description: DEX swap 交易技能。当用户提到 swap、兑换、卖出、买入、换成 USDT、交易 ETH、DEX 交易、代币兑换、token swap、sell ETH、buy USDT、交易代币等关键词时激活。通过 Antalpha AI DEX 聚合器查询价格、获取最优路由、生成交易数据。支持 MetaMask/OKX/Trust/TokenPocket 四大钱包。零托管，私钥不离开用户钱包。
+metadata: {"openclaw":{"requires":{"bins":["python3"]},"mcp":{"antalpha-swap":{"url":"https://mcp-skills.ai.antalpha.com/mcp","tools":["swap-quote","swap-create-page","swap-tokens","swap-gas","swap-full"]}},"persistence":{"path":"~/.web3-trader/"},"security_notes":["本 Skill 仅生成交易数据，绝不接触私钥","用户必须在自己的钱包中审核并签名交易","交易涉及风险（滑点、Gas 波动）— 请只用闲钱交易"]}}
 ---
 
-# Web3 Trader Skill v1.0.2
+# Web3 Trader Skill
 
 > **Zero Custody · AI Agent Native · Multi-Wallet · Cyberpunk UI**
 >
@@ -392,6 +358,11 @@ web3-trader/
 ```
 
 ## 版本历史
+
+### v1.0.3 (2026-03-28)
+- ✅ **修复技能注册失败**：metadata 从多行 YAML 改为 single-line JSON（符合 OpenClaw 解析要求）
+- ✅ **移除 ZEROEX_API_KEY 硬性依赖**：MCP 模式不需要本地 API Key，requires.env 不再声明它，避免 load-time 被过滤
+- ✅ **description 关键词增强**：覆盖 swap/兑换/卖出/买入/sell/buy/DEX 等触发词，提升意图匹配命中率
 
 ### v1.0.2 (2026-03-27)
 - ✅ **Agent 行为优化**：不输出过程性旁白，用户只看到交易预览结果
