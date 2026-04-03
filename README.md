@@ -1,172 +1,128 @@
-# 🔄 Web3 Trader Skill v1.0.4
+# @antalpha/web3-trader
 
-> **AI-Native DEX Trading Tool | Zero Custody | Multi-Wallet | Cyberpunk UI**
->
-> Powered by Antalpha AI DEX Aggregator
-
----
-
-## Features
-
-- 💱 Real-time DEX quotes and optimal routing via Antalpha AI Aggregator
-- 🌐 Cyberpunk-style swap pages (Matrix rain animation + scanline effects)
-- 📱 4 major wallets: MetaMask, OKX Web3, Trust Wallet, TokenPocket
-- ⚡ Auto-execute in wallet dApp browser (2s countdown → direct signature popup)
-- 📷 QR code generation with cyberpunk theme (cyan dots on dark background)
-- 🔒 Zero custody — private keys never leave the user's wallet
-- 🤖 MCP remote mode — one `swap-full` call does quote + page hosting
-
-## Architecture
-
-```
-┌──────────────┐    MCP JSON-RPC    ┌──────────────────────────────┐
-│  AI Agent    │ ──────────────────► │  Antalpha MCP Server          │
-│  (OpenClaw)  │  swap-full          │  mcp-skills.ai.antalpha.com   │
-│              │ ◄────────────────── │                                │
-│              │  quote + preview_url │  ├─ 0x API ── DEX Aggregation │
-└──────┬───────┘                     │  ├─ Page Gen ── Cyberpunk HTML │
-       │                             │  └─ Hosting ── URL + QR        │
-       │  send preview_url + QR      └────────────────────────────────┘
-       ▼
-┌──────────────┐   click/scan    ┌────────────────────┐
-│  User        │ ──────────────► │  Hosted Swap Page   │
-│  (mobile/PC) │                 │  (Cyberpunk UI)     │
-└──────────────┘                 └────────┬───────────┘
-                                          │ eth_sendTransaction
-                                          ▼
-                                 ┌────────────────────┐
-                                 │  Wallet App         │
-                                 │  Sign & Broadcast   │
-                                 └────────────────────┘
-```
+DEX trading skill for the Antalpha AI MCP platform. Provides market swap (0x) and Smart Swap (1inch Fusion) capabilities.
 
 ## Quick Start
 
-### MCP Remote Mode (Recommended)
-
-No local setup needed. The AI agent calls the Antalpha MCP Server directly:
-
-```
-MCP Server: https://mcp-skills.ai.antalpha.com/mcp
-```
-
-Available MCP Tools:
-
-| Tool | Description |
-|------|-------------|
-| `swap-full` | **One-shot**: quote + generate page + host → returns URL + QR |
-| `swap-quote` | Get DEX aggregated quote |
-| `swap-create-page` | Generate and host a cyberpunk swap page |
-| `swap-tokens` | List supported tokens |
-| `swap-gas` | Current gas price |
-
-### Local CLI Mode (Fallback)
-
 ```bash
-# Install dependencies
-pip install requests web3 qrcode pillow
+# Set environment variables
+export ZEROEX_API_KEY="your-0x-api-key"
+export ONEINCH_API_KEY="your-1inch-api-key"
 
-# Configure API key
-cp references/config.example.yaml ~/.web3-trader/config.yaml
-
-# Query price
-python3 scripts/trader_cli.py price --from ETH --to USDT --amount 0.1
-
-# Generate swap page
-python3 scripts/trader_cli.py swap-page --from ETH --to USDT --amount 0.1 \
-  --wallet 0xYourAddress -o swap.html --json
+# Start the MCP server (from monorepo root)
+pnpm run start:dev
 ```
 
-## Supported Tokens (Ethereum Mainnet)
-
-| Category | Tokens |
-|----------|--------|
-| Stablecoins | USDT, USDC, DAI |
-| Native/Wrapped | ETH, WETH, WBTC |
-| DeFi | LINK, UNI |
-
-## Supported Wallets
-
-| Wallet | Deeplink Protocol | Status |
-|--------|-------------------|--------|
-| 🦊 MetaMask | `metamask.app.link/dapp/` | ✅ Verified |
-| 💎 OKX Web3 | `okx://wallet/dapp/details` | ✅ Verified |
-| 🛡️ Trust Wallet | `link.trustwallet.com/open_url` | ✅ Verified |
-| 📱 TokenPocket | `tpdapp://open` | ✅ Verified |
-
-## Project Structure
+## Module Structure
 
 ```
-├── SKILL.md                 # Full skill spec (read by AI agent)
-├── MCP_REQUIREMENTS.md      # MCP server requirements doc
-├── DEPLOYMENT.md            # Server deployment guide
-├── README.md                # This file
-├── requirements.txt         # Python dependencies
-├── scripts/
-│   ├── trader_cli.py        # CLI entry point
-│   ├── zeroex_client.py     # Antalpha AI API client
-│   └── swap_page_gen.py     # Cyberpunk swap page generator
-├── references/
-│   ├── config.example.yaml  # Config template
-│   ├── SECURITY.md          # Security documentation
-│   └── ANTALPHA_MCP_SERVER_SPEC.md
-├── examples/
-│   └── swap_usdt_eth.py     # Example script
-└── tests/
-    └── test_zeroex_client.py
+libs/skills/web3-trader/src/
+├── service/
+│   ├── zeroex.service.ts          # 0x swap API client
+│   ├── smart-swap.service.ts      # 1inch Fusion Smart Swap engine
+│   ├── smart-swap-page.service.ts # Signing page HTML generator
+│   ├── swap-page.service.ts       # Market swap page generator
+│   ├── swap-html-file.service.ts  # HTML file writer
+│   └── web3-trader.config.ts      # Environment config
+├── tools/
+│   └── web3-trader.tools.ts       # MCP tool definitions
+├── web3-trader.module.ts          # NestJS module
+└── index.ts                       # Public exports
 ```
 
-## Security
+## MCP Tools
 
-| Layer | Protection |
-|-------|-----------|
-| Private Keys | **Zero contact** — skill never holds, transmits, or stores any private key |
-| Transaction Data | Generated by 0x Protocol with MEV protection (anti-sandwich) |
-| Slippage | Configurable max slippage (default 0.5%), `minBuyAmount` enforced on-chain |
-| Review | User sees full transaction details in wallet before signing |
-| Swap Pages | Self-contained HTML, no backend communication, no cookies, no tracking |
+### Market Swap (0x)
 
-## Changelog
+| Tool | Method | Description |
+|------|--------|-------------|
+| `swap-quote` | GET | Indicative price — no commitment |
+| `swap-full` | GET | Firm quote with transaction calldata |
+| `swap-tokens` | GET | List supported token symbols |
+| `swap-gas` | GET | Current gas price (Gwei) |
 
-### v1.0.4 (2026-03-28)
-- **[P0]** Fix `examples/` and `tests/` using wrong parameter names (`wallet_address`/`slippage` → `taker`)
-- **[P0]** Fix XSS vulnerability in `swap_page_gen.py` — all user-controlled data now escaped via `html.escape()`
-- **[P0]** Remove auto-execute in dApp browser — users must explicitly click to confirm swap
-- **[P1]** Add `timeout=30s` to all HTTP requests to prevent infinite hangs
-- **[P1]** Preserve exception info in `get_gas_info()` error handling
-- **[P1]** Add error handling for file write in `cmd_swap_page`
-- **[P1]** Add missing `pyyaml` to `requirements.txt`
-- **[P2]** Use `Decimal` for amount calculations instead of `float`
-- **[P2]** Deduplicate `get_token_address` (alias to `_resolve_token`) and extract shared logic in `cmd_price`/`cmd_route`
-- **[P2]** Fix HTML `lang="zh"` → `lang="en"`
+### Smart Swap (1inch Fusion)
 
-### v1.0.3 (2026-03-28)
-- Fix: `metadata` changed from multi-line YAML to single-line JSON (OpenClaw parser requirement)
-- Fix: remove `ZEROEX_API_KEY` from `requires.env` (MCP mode doesn't need it; was causing load-time gating)
-- Enhance: `description` now covers swap/兑换/卖出/买入/sell/buy/DEX trigger keywords for better intent matching
+| Tool | Method | Description |
+|------|--------|-------------|
+| `smart-swap-create` | POST | Create a Fusion Dutch auction order |
+| `smart-swap-list` | GET | List orders by wallet address |
+| `smart-swap-status` | GET | Order status by hash |
+| `smart-swap-cancel` | GET | Check cancellation status/options |
 
-### v1.0.2 (2026-03-27)
-- Agent behavior: no verbose output, only swap preview + QR code image
-- QR code generated from MCP `preview_url` and sent as image attachment
-- Updated message template with routing info
+## Smart Swap Flow
 
-### v1.0.1 (2026-03-27)
-- Antalpha MCP Server integration (`mcp-skills.ai.antalpha.com/mcp`)
-- `swap-full` one-shot: quote + page generation + server hosting
-- Swap pages hosted on trusted Antalpha domain
-- Agent no longer needs local 0x API key
+```
+1. Agent calls smart-swap-create(sell_token, buy_token, sell_amount, target_price, ...)
+2. Server fetches Fusion quote → injects custom auctionEndAmount (user's floor price)
+3. Server builds EIP-712 typed data + generates signing page HTML
+4. Returns: typed_data, preview_url, qr_image_url
+5. User opens signing page → connects wallet → signs EIP-712 → submits to Fusion relayer
+6. Resolver network fills the order (user pays zero gas)
+7. Agent checks status via smart-swap-status or smart-swap-list
+```
 
-### v1.0.0 (2026-03-27)
-- Cyberpunk swap pages (Matrix rain + scanline effects)
-- 4 wallet support: MetaMask, OKX Web3, Trust Wallet, TokenPocket
-- Auto-execute in wallet dApp browser (2s countdown)
-- QR code generation (cyan on dark theme)
-- Full CLI toolchain (price/route/build-tx/export/swap-page/gas/tokens)
+## Smart Swap Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `sell_token` | string | Token to sell (symbol or 0x address) |
+| `buy_token` | string | Token to buy (symbol or 0x address) |
+| `sell_amount` | string | Amount to sell (human-readable, e.g. "0.1") |
+| `target_price` | string | Floor price — minimum acceptable rate |
+| `expiry` | string | Order expiry (e.g. "10m", "1h", default "10m") |
+| `wallet` | string | Maker wallet address (0x...) |
+| `engine` | string | Always "1inch" (default) |
+
+## Signing Page
+
+The signing page is a self-contained HTML file with:
+
+- **Zero external dependencies** (no CDN, no Google Fonts)
+- **4 wallet connectors**: MetaMask, OKX Web3, Trust Wallet, TokenPocket
+- **DApp browser detection**: Auto-connects in wallet DApp browsers
+- **USDT compatibility**: `approve(0)` → wait → `approve(max)` flow
+- **Cyberpunk UI**: Dark theme, neon accents, step-by-step progress
+- **Wallet validation**: Checks connected address matches order maker
+
+## USDT Approve Handling
+
+USDT requires `approve(0)` before setting a new allowance (if current > 0). The signing page automatically:
+
+1. Checks current allowance
+2. If > 0: sends `approve(0)`, waits for confirmation
+3. Sends `approve(maxUint256)`
+4. Proceeds to EIP-712 signing
+
+This is safe for all ERC-20 tokens (only USDT-like tokens actually need the double approve).
+
+## Token List
+
+50 tokens supported on Ethereum mainnet. See `TOKENS` constant in `zeroex.service.ts`.
+
+## Configuration
+
+All config via environment variables (see `web3-trader.config.ts`):
+
+```typescript
+export const web3TraderConfig = registerAs("web3-trader", () => ({
+  zeroExApiKey: process.env.ZEROEX_API_KEY ?? "",
+  oneInchApiKey: process.env.ONEINCH_API_KEY ?? "",
+  defaultChainId: Number(process.env.WEB3_TRADER_DEFAULT_CHAIN_ID ?? 1),
+  defaultSlippageBps: Number(process.env.WEB3_TRADER_DEFAULT_SLIPPAGE_BPS ?? 100),
+  swapHostBaseUrl: process.env.SWAP_HOST_BASE_URL ?? "https://api.0x.org/swap/allowance-holder",
+  htmlOutputDir: process.env.WEB3_TRADER_HTML_OUTPUT_DIR ?? "/tmp/web3-trader-pages",
+  publicBaseUrl: process.env.WEB3_TRADER_PUBLIC_BASE_URL ?? "",
+}));
+```
+
+## Dependencies
+
+- `@modelcontextprotocol/sdk` — MCP protocol
+- `axios` — HTTP client
+- `zod/v3` — Schema validation for MCP tools
+- `@antalpha/libs-shared` — Shared utilities
 
 ## License
 
-MIT
-
----
-
-*Powered by Antalpha AI*
+Proprietary — Antalpha AI
