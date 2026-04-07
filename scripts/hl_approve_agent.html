@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hyperliquid Agent Authorization</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0f;color:#e0e0e0;font-family:'SF Mono','Fira Code',monospace;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.container{max-width:520px;width:90%;padding:32px}
+h1{font-size:20px;color:#00ffa3;margin-bottom:8px}
+.subtitle{color:#666;font-size:13px;margin-bottom:32px}
+.step{background:#111118;border:1px solid #222;border-radius:8px;padding:20px;margin-bottom:16px;transition:border-color .3s}
+.step.active{border-color:#00ffa3}
+.step.done{border-color:#333;opacity:.6}
+.step-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.step-num{width:28px;height:28px;border-radius:50%;background:#1a1a2e;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:13px;color:#666}
+.step.active .step-num{border-color:#00ffa3;color:#00ffa3}
+.step.done .step-num{background:#00ffa3;color:#000;border-color:#00ffa3}
+.step-title{font-size:15px;font-weight:600}
+.step-desc{color:#888;font-size:12px;margin-left:38px}
+button{background:#00ffa3;color:#000;border:none;padding:12px 24px;border-radius:6px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:16px;transition:opacity .2s}
+button:hover{opacity:.9}
+button:disabled{background:#333;color:#666;cursor:not-allowed}
+.result{background:#0d1117;border:1px solid #00ffa3;border-radius:8px;padding:20px;margin-top:24px;display:none}
+.result h3{color:#00ffa3;margin-bottom:12px;font-size:14px}
+.key-box{background:#000;border:1px solid #333;border-radius:4px;padding:12px;font-size:12px;word-break:break-all;margin-bottom:8px;position:relative}
+.key-label{color:#666;font-size:11px;margin-bottom:4px}
+.key-value{color:#fff;padding-right:50px}
+.copy-btn{position:absolute;top:8px;right:8px;background:#222;color:#aaa;border:1px solid #333;padding:2px 8px;border-radius:4px;font-size:11px;cursor:pointer;width:auto}
+.copy-btn:hover{color:#00ffa3;border-color:#00ffa3}
+.warning{background:#1a1000;border:1px solid #f0a000;border-radius:6px;padding:12px;margin-top:16px;font-size:12px;color:#f0a000}
+.error{color:#ff4444;font-size:12px;margin-top:8px;display:none}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #000;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.addr{color:#00ffa3;font-size:12px;margin-top:8px}
+.brand{color:#a855f7;font-size:13px;font-weight:700;letter-spacing:2px;margin-bottom:8px}
+.footer{text-align:center;color:#444;font-size:11px;margin-top:32px;padding-top:16px;border-top:1px solid #1a1a2e}
+.brand-text{color:#a855f7;font-weight:700}
+.log{background:#0d1117;border:1px solid #222;border-radius:6px;padding:12px;margin-top:16px;font-size:11px;color:#888;max-height:200px;overflow-y:auto;display:none}
+.log div{margin-bottom:4px}
+.log .ok{color:#00ffa3}
+.log .err{color:#ff4444}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="brand">⚡ Antalpha AI</div>
+  <h1>Hyperliquid Agent Setup</h1>
+  <p class="subtitle">Authorize an Agent Wallet for automated trading.<br>Your main private key never leaves MetaMask.</p>
+
+  <div class="step active" id="step1">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Connect Wallet</div>
+    </div>
+    <div class="step-desc">Connect your MetaMask wallet</div>
+    <div class="addr" id="walletAddr" style="display:none"></div>
+  </div>
+
+  <div class="step" id="step2">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Sign Authorization</div>
+    </div>
+    <div class="step-desc">Sign EIP-712 typed data to approve the agent wallet</div>
+  </div>
+
+  <div class="step" id="step3">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Submit to Hyperliquid</div>
+    </div>
+    <div class="step-desc">Post the signed authorization to the exchange</div>
+  </div>
+
+  <button id="mainBtn" onclick="handleClick()">Connect Wallet</button>
+  <div class="error" id="errorMsg"></div>
+  <div class="log" id="logBox"></div>
+
+  <div class="result" id="resultBox">
+    <h3>✅ Agent Wallet Authorized</h3>
+    <div class="key-box">
+      <div class="key-label">Agent Private Key (save this!)</div>
+      <div class="key-value" id="agentKey"></div>
+      <button class="copy-btn" onclick="copyKey('agentKey')">copy</button>
+    </div>
+    <div class="key-box">
+      <div class="key-label">Agent Address</div>
+      <div class="key-value" id="agentAddr"></div>
+      <button class="copy-btn" onclick="copyKey('agentAddr')">copy</button>
+    </div>
+    <div class="key-box">
+      <div class="key-label">Your Wallet (Owner)</div>
+      <div class="key-value" id="ownerAddr"></div>
+      <button class="copy-btn" onclick="copyKey('ownerAddr')">copy</button>
+    </div>
+    <div class="warning">
+      ⚠️ <b>Save the Agent Private Key now.</b> It will NOT be shown again.<br>
+      The agent can place/cancel orders and transfer between spot↔perp, but <b>cannot withdraw</b> your funds.
+    </div>
+  </div>
+
+  <div class="footer">Powered by <span class="brand-text">Antalpha AI</span> · Zero Custody Trading</div>
+</div>
+
+<script>
+const HL_API = 'https://api.hyperliquid.xyz';
+
+// EIP-712 domain — chainId will be set dynamically to match MetaMask's active chain
+// SDK comment: "signatureChainId is the chain used by the wallet to sign and can be any chain"
+function makeDomain(chainId) {
+  return {
+    name: 'HyperliquidSignTransaction',
+    version: '1',
+    chainId: chainId,
+    verifyingContract: '0x0000000000000000000000000000000000000000'
+  };
+}
+
+// Only these fields are in the EIP-712 types
+const TYPES = {
+  'HyperliquidTransaction:ApproveAgent': [
+    { name: 'hyperliquidChain', type: 'string' },
+    { name: 'agentAddress', type: 'address' },
+    { name: 'agentName', type: 'string' },
+    { name: 'nonce', type: 'uint64' }
+  ]
+};
+
+let state = 'connect';
+let userAddr = null;
+let agentPrivKey = null;
+let agentAddress = null;
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function log(msg, cls) {
+  const box = document.getElementById('logBox');
+  box.style.display = 'block';
+  const d = document.createElement('div');
+  if (cls) d.className = cls;
+  d.textContent = '> ' + msg;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+
+function setStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('step' + i);
+    el.classList.remove('active', 'done');
+    if (i < n) el.classList.add('done');
+    if (i === n) el.classList.add('active');
+  }
+}
+
+async function handleClick() {
+  showError('');
+  const btn = document.getElementById('mainBtn');
+
+  if (state === 'connect') {
+    if (!window.ethereum) {
+      showError('MetaMask not detected. Please install MetaMask or open in a DApp browser.');
+      return;
+    }
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Connecting...';
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      userAddr = accounts[0].toLowerCase();
+      document.getElementById('walletAddr').textContent = '✓ ' + userAddr;
+      document.getElementById('walletAddr').style.display = 'block';
+      log('Wallet connected: ' + userAddr, 'ok');
+      state = 'sign';
+      setStep(2);
+      btn.innerHTML = 'Authorize Agent Wallet';
+      btn.disabled = false;
+    } catch (e) {
+      showError('Connection rejected: ' + e.message);
+      btn.innerHTML = 'Connect Wallet';
+      btn.disabled = false;
+    }
+    return;
+  }
+
+  if (state === 'sign') {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Waiting for signature...';
+    try {
+      // 1. Generate agent keypair
+      const wallet = ethers.Wallet.createRandom();
+      agentPrivKey = wallet.privateKey;
+      agentAddress = wallet.address;
+      log('Agent wallet generated: ' + agentAddress);
+
+      const nonce = Date.now();
+      log('Nonce (timestamp ms): ' + nonce);
+
+      // 2. Detect current chain from MetaMask
+      const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
+      const currentChainId = parseInt(chainIdHex, 16);
+      const signatureChainIdHex = '0x' + currentChainId.toString(16);
+      log('Active chain: ' + currentChainId + ' (' + chainIdHex + ')');
+
+      // 3. Build EIP-712 message
+      const message = {
+        hyperliquidChain: 'Mainnet',
+        agentAddress: agentAddress,
+        agentName: 'McBit Agent',
+        nonce: nonce
+      };
+
+      // 4. Request signature via MetaMask — domain.chainId matches wallet's active chain
+      const domain = makeDomain(currentChainId);
+      const msgParams = JSON.stringify({
+        domain: domain,
+        types: {
+          EIP712Domain: [
+            { name: 'name', type: 'string' },
+            { name: 'version', type: 'string' },
+            { name: 'chainId', type: 'uint256' },
+            { name: 'verifyingContract', type: 'address' }
+          ],
+          ...TYPES
+        },
+        primaryType: 'HyperliquidTransaction:ApproveAgent',
+        message: message
+      });
+
+      log('Requesting EIP-712 signature...');
+      const sig = await window.ethereum.request({
+        method: 'eth_signTypedData_v4',
+        params: [userAddr, msgParams]
+      });
+      log('Signature received', 'ok');
+
+      // 4. Parse r, s, v
+      const r = '0x' + sig.slice(2, 66);
+      const s = '0x' + sig.slice(66, 130);
+      const v = parseInt(sig.slice(130, 132), 16);
+      log('r=' + r.slice(0, 10) + '... s=' + s.slice(0, 10) + '... v=' + v);
+
+      // 5. Submit to Hyperliquid
+      state = 'submit';
+      setStep(3);
+      btn.innerHTML = '<span class="spinner"></span>Submitting...';
+
+      // Action matches SDK: type, agentAddress, agentName, hyperliquidChain, signatureChainId, nonce
+      // signatureChainId must match the chain used for signing (wallet's active chain)
+      const action = {
+        type: 'approveAgent',
+        hyperliquidChain: 'Mainnet',
+        signatureChainId: signatureChainIdHex,
+        agentAddress: agentAddress,
+        agentName: 'McBit Agent',
+        nonce: nonce
+      };
+
+      const payload = {
+        action: action,
+        nonce: nonce,
+        signature: { r, s, v }
+      };
+
+      log('POST /exchange ...');
+      const resp = await fetch(HL_API + '/exchange', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await resp.json();
+      log('Response: ' + JSON.stringify(result));
+
+      if (result.status === 'ok') {
+        log('✅ Agent approved!', 'ok');
+        state = 'done';
+        btn.style.display = 'none';
+        document.getElementById('agentKey').textContent = agentPrivKey;
+        document.getElementById('agentAddr').textContent = agentAddress;
+        document.getElementById('ownerAddr').textContent = userAddr;
+        document.getElementById('resultBox').style.display = 'block';
+        setStep(4);
+      } else {
+        throw new Error('API error: ' + JSON.stringify(result));
+      }
+
+    } catch (e) {
+      showError(e.message);
+      log('Error: ' + e.message, 'err');
+      state = 'sign';
+      setStep(2);
+      btn.innerHTML = 'Authorize Agent Wallet';
+      btn.disabled = false;
+    }
+    return;
+  }
+}
+
+function copyKey(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = '✓';
+    setTimeout(() => btn.textContent = 'copy', 1500);
+  });
+}
+</script>
+</body>
+</html>

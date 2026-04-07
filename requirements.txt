@@ -1,0 +1,8 @@
+requests>=2.28.0
+web3>=6.0.0
+qrcode>=7.0
+pillow>=9.0
+pyyaml>=6.0
+# v2: Hyperliquid CLOB trading
+hyperliquid-python-sdk>=0.22.0
+eth-account>=0.10.0
