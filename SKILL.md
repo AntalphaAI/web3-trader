@@ -612,6 +612,13 @@ cd scripts && python3 -m http.server 8199 --bind 127.0.0.1 &
 cloudflared tunnel --url http://127.0.0.1:8199
 ```
 
+### Changelog v2.0.3 (2026-04-07)
+- ✅ **MCP Tools 全量上线** — 24 个工具完整配置（swap 5 个 + smart-swap 4 个 + hl 15 个）
+- ✅ **SKILL.md 全面更新** — 新增 Hyperliquid 全功能说明、三级风控、余额预检、容错恢复
+- ✅ **前端结构重组** — `scripts/`、`references/`、`tests/`、`examples/` 目录规范化
+- ✅ **install.sh 新增** — 一键安装脚本
+- ✅ **安全文档** `references/SECURITY.md` — 零托管安全说明
+
 ### Changelog v2.0.2 (2026-04-06)
 - ✅ **修复 `get_asset_index` 缺失** — `hl_client.py` 补充按名称查找资产索引方法（BTC=0, ETH=1）
 - ✅ **MCP Module 注释修正** — `hyperliquid.tools.ts` + `README.md` tool 数量 12 → 14
