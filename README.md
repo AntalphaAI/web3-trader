@@ -1,4 +1,4 @@
-# 🔄 Web3 Trader Skill v1.0.4
+# 🔄 Web3 Trader Skill v2.0.3
 
 > **AI-Native DEX Trading Tool | Zero Custody | Multi-Wallet | Cyberpunk UI**
 >
@@ -127,6 +127,33 @@ python3 scripts/trader_cli.py swap-page --from ETH --to USDT --amount 0.1 \
 | Swap Pages | Self-contained HTML, no backend communication, no cookies, no tracking |
 
 ## Changelog
+
+### v2.0.3 (2026-04-07)
+- ✅ **MCP Tools 全量上线** — 24 个工具完整配置（swap 5 个 + smart-swap 4 个 + hl 15 个）
+- ✅ **SKILL.md 全面更新** — 新增 Hyperliquid 全功能说明、三级风控、余额预检、容错恢复
+- ✅ **前端结构重组** — `scripts/`、`references/`、`tests/`、`examples/` 目录规范化
+- ✅ **install.sh 新增** — 一键安装脚本，自动配置依赖
+- ✅ **安全文档** `references/SECURITY.md` — 零托管安全说明
+
+### v2.0.2 (2026-04-06)
+- ✅ **修复 `get_asset_index` 缺失** — `hl_client.py` 补充按名称查找资产索引方法（BTC=0, ETH=1）
+- ✅ **MCP Module 注释修正** — tool 数量 12 → 14
+- ✅ **`cliPath` 部署说明** — 支持 `HL_CLI_PATH` 环境变量覆盖，补充 A/B 两种配置方案
+
+### v2.0.1 (2026-04-05)
+- ✅ **三级风控确认** — <$100 自动 / $100-1000 单确认 / ≥$1000 或 ≥10x 双确认
+- ✅ **余额预检** — 下单前查 margin available，不足直接拒绝
+- ✅ **订单修改** — `modify-order` 命令，原子改价改量
+- ✅ **下单失败容错** — 报错后查 userFills 确认是否实际成交，防重复下单
+- ✅ **新增 `hl_risk.py`** — 独立风控引擎模块
+
+### v2.0.0 (2026-04-05)
+- ✅ **Hyperliquid CLOB 限价单 & 永续合约** — v2 核心新功能
+- ✅ **Agent Wallet 零托管模式** — 用户 MetaMask 签一次 `approveAgent`，AI Agent 后续自动交易
+- ✅ **主网端到端验证通过** — 限价单挂单/撤单、市价买入/平仓全部成功
+- ✅ **Unified Account 兼容** — 自动检测，无需手动 spot↔perp 划转
+- ✅ **授权页面** `hl_approve_agent.html` + 转账页面 `hl_transfer.html`
+- ✅ **MCP Tools 规范** — `references/HL_MCP_TOOLS_SPEC.md`
 
 ### v1.0.4 (2026-03-28)
 - **[P0]** Fix `examples/` and `tests/` using wrong parameter names (`wallet_address`/`slippage` → `taker`)
