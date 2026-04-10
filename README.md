@@ -329,6 +329,12 @@ MIT · Powered by Antalpha AI
 openclaw skill install https://github.com/AntalphaAI/web3-trader
 ```
 
+### 通过 ClawHub 安装
+
+```bash
+clawhub install web3-trader
+```
+
 ## 功能特性
 
 ### v1 — DEX Swap（Antalpha AI 聚合器）
@@ -406,6 +412,12 @@ https://mcp-skills.ai.antalpha.com/mcp
 
 ```bash
 openclaw skill install https://github.com/AntalphaAI/web3-trader
+```
+
+### 通过 ClawHub 安装
+
+```bash
+clawhub install web3-trader
 ```
 
 ### MCP 远程模式（推荐）
