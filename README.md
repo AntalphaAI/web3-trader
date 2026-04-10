@@ -2,36 +2,46 @@
 
 > **AI-Native DEX Trading + Hyperliquid Perp | Zero Custody | Multi-Wallet | Cyberpunk UI**
 >
+> **AI 原生 DEX 交易 + Hyperliquid 永续合约 | 零托管 | 多钱包支持 | 赛博朋克 UI**
+>
 > Powered by Antalpha AI · v1 DEX Swap + v2 Hyperliquid CLOB & Perpetuals
 
 ---
 
-## Features
+## Install / 安装
 
-### v1 — DEX Swap (Antalpha AI Aggregator)
-- 💱 Real-time DEX quotes and optimal routing via Antalpha AI Aggregator
-- 🌐 Cyberpunk-style swap pages (Matrix rain animation + scanline effects)
-- 📱 4 major wallets: MetaMask, OKX Web3, Trust Wallet, TokenPocket
-- 🔒 Zero custody — private keys never leave the user's wallet
-- 🤖 MCP remote mode — one `swap-full` call does quote + page hosting + QR
-
-### v2 — Hyperliquid CLOB & Perpetuals (NEW)
-- 📈 True limit orders on Hyperliquid on-chain CLOB order book
-- ♾️ Perpetual contracts — 229+ trading pairs, up to 40x leverage
-- 🤖 Agent Wallet zero-custody mode — user signs `approveAgent` once, AI trades automatically
-- 🛡️ 3-tier risk control — auto / single-confirm / double-confirm by trade size
-- 💰 Pre-trade balance check — rejects orders before they fail
-- 🔁 Order modify & fail-safe recovery — prevent duplicate fills
-- 📊 Full position management — TP/SL, close, funding rate queries
+```bash
+openclaw skill install https://github.com/AntalphaAI/web3-trader
+```
 
 ---
 
-## Two Modes
+## Features / 功能特性
 
-| Mode | Description | Use Case |
+### v1 — DEX Swap (Antalpha AI Aggregator)
+- 💱 Real-time DEX quotes and optimal routing via Antalpha AI Aggregator / 通过 Antalpha AI 聚合器获取实时 DEX 报价和最优路由
+- 🌐 Cyberpunk-style swap pages (Matrix rain animation + scanline effects) / 赛博朋克风格兑换页面（矩阵雨动画 + 扫描线特效）
+- 📱 4 major wallets: MetaMask, OKX Web3, Trust Wallet, TokenPocket / 支持 4 大主流钱包
+- 🔒 Zero custody — private keys never leave the user's wallet / 零托管——私钥永远不离开用户钱包
+- 🤖 MCP remote mode — one `swap-full` call does quote + page hosting + QR / MCP 远程模式——一次 `swap-full` 调用完成报价 + 页面托管 + 二维码
+
+### v2 — Hyperliquid CLOB & Perpetuals (NEW / 新功能)
+- 📈 True limit orders on Hyperliquid on-chain CLOB order book / Hyperliquid 链上 CLOB 订单簿真实限价单
+- ♾️ Perpetual contracts — 229+ trading pairs, up to 40x leverage / 永续合约——229+ 交易对，最高 40 倍杠杆
+- 🤖 Agent Wallet zero-custody mode — user signs `approveAgent` once, AI trades automatically / Agent 钱包零托管模式——用户只需签名一次 `approveAgent`，AI 自动交易
+- 🛡️ 3-tier risk control — auto / single-confirm / double-confirm by trade size / 三级风控——按交易规模自动/单次/双重确认
+- 💰 Pre-trade balance check — rejects orders before they fail / 交易前余额检查——提前拦截余额不足的订单
+- 🔁 Order modify & fail-safe recovery — prevent duplicate fills / 订单修改与容错恢复——防止重复成交
+- 📊 Full position management — TP/SL, close, funding rate queries / 完整仓位管理——止盈止损、平仓、资金费率查询
+
+---
+
+## Two Modes / 两种模式
+
+| Mode / 模式 | Description / 说明 | Use Case / 适用场景 |
 |------|-------------|----------|
-| 🌐 **MCP Remote Mode** (Recommended) | Antalpha MCP Server handles quote + page hosting | Production, no local API key needed |
-| 🖥️ **Local CLI Mode** (Fallback) | Python CLI calls 0x API locally | Dev/debug, offline environments |
+| 🌐 **MCP Remote Mode** (Recommended / 推荐) | Antalpha MCP Server handles quote + page hosting / MCP 服务器处理报价和页面托管 | Production, no local API key needed / 生产环境，无需本地 API Key |
+| 🖥️ **Local CLI Mode** (Fallback / 备选) | Python CLI calls 0x API locally / Python CLI 本地调用 0x API | Dev/debug, offline environments / 开发调试、离线环境 |
 
 ---
 
@@ -41,49 +51,49 @@
 https://mcp-skills.ai.antalpha.com/mcp
 ```
 
-### Available MCP Tools (24 total)
+### Available MCP Tools (24 total) / MCP 工具列表（共 24 个）
 
-#### v1 — DEX Swap (5 tools)
+#### v1 — DEX Swap (5 tools / 5 个工具)
 
-| Tool | Description |
+| Tool / 工具 | Description / 说明 |
 |------|-------------|
-| `swap-full` | **One-shot**: quote + generate page + host → returns URL + QR |
-| `swap-quote` | Get DEX aggregated quote |
-| `swap-create-page` | Generate and host a cyberpunk swap page |
-| `swap-tokens` | List supported tokens |
-| `swap-gas` | Current gas price |
+| `swap-full` | **One-shot**: quote + generate page + host → returns URL + QR / **一步完成**：报价 + 生成页面 + 托管 → 返回链接 + 二维码 |
+| `swap-quote` | Get DEX aggregated quote / 获取 DEX 聚合报价 |
+| `swap-create-page` | Generate and host a cyberpunk swap page / 生成并托管赛博朋克风格兑换页面 |
+| `swap-tokens` | List supported tokens / 查看支持的代币列表 |
+| `swap-gas` | Current gas price / 当前 Gas 价格 |
 
-#### v1 — Smart Swap (4 tools)
+#### v1 — Smart Swap (4 tools / 4 个工具)
 
-| Tool | Description |
+| Tool / 工具 | Description / 说明 |
 |------|-------------|
-| `smart-swap-create` | Create a smart swap order with auto-routing |
-| `smart-swap-list` | List active smart swap orders |
-| `smart-swap-status` | Query smart swap order status |
-| `smart-swap-cancel` | Cancel a smart swap order |
+| `smart-swap-create` | Create a smart swap order with auto-routing / 创建自动路由的智能兑换订单 |
+| `smart-swap-list` | List active smart swap orders / 查看活跃的智能兑换订单 |
+| `smart-swap-status` | Query smart swap order status / 查询智能兑换订单状态 |
+| `smart-swap-cancel` | Cancel a smart swap order / 取消智能兑换订单 |
 
-#### v2 — Hyperliquid (15 tools)
+#### v2 — Hyperliquid (15 tools / 15 个工具)
 
-| Tool | Description |
+| Tool / 工具 | Description / 说明 |
 |------|-------------|
-| `hl-price` | Real-time price for any trading pair |
-| `hl-account` | Account info (balance, margin, equity) |
-| `hl-book` | Order book depth |
-| `hl-orders` | List open orders |
-| `hl-positions` | List open positions |
-| `hl-funding` | Funding rate rankings |
-| `hl-balance-check` | Pre-trade balance check (spot or perp) |
-| `hl-limit-order` | Place CLOB limit order |
-| `hl-market-order` | Place perpetual market order |
-| `hl-close` | One-click market close position |
-| `hl-cancel` | Cancel open order |
-| `hl-leverage` | Set leverage for a trading pair |
-| `hl-tp-sl` | Set take-profit / stop-loss trigger orders |
-| `hl-modify-order` | Atomically modify price and size of open order |
+| `hl-price` | Real-time price for any trading pair / 任意交易对实时价格 |
+| `hl-account` | Account info (balance, margin, equity) / 账户信息（余额、保证金、净值） |
+| `hl-book` | Order book depth / 订单簿深度 |
+| `hl-orders` | List open orders / 查看挂单列表 |
+| `hl-positions` | List open positions / 查看持仓列表 |
+| `hl-funding` | Funding rate rankings / 资金费率排行 |
+| `hl-balance-check` | Pre-trade balance check (spot or perp) / 交易前余额检查（现货或永续） |
+| `hl-limit-order` | Place CLOB limit order / 挂限价单 |
+| `hl-market-order` | Place perpetual market order / 下永续合约市价单 |
+| `hl-close` | One-click market close position / 一键市价平仓 |
+| `hl-cancel` | Cancel open order / 撤销挂单 |
+| `hl-leverage` | Set leverage for a trading pair / 设置交易对杠杆倍数 |
+| `hl-tp-sl` | Set take-profit / stop-loss trigger orders / 设置止盈止损触发单 |
+| `hl-modify-order` | Atomically modify price and size of open order / 原子性修改挂单价格和数量 |
 
 ---
 
-## Architecture
+## Architecture / 架构
 
 ### v1 — DEX Swap Flow
 
@@ -133,9 +143,17 @@ https://mcp-skills.ai.antalpha.com/mcp
 
 ---
 
-## Quick Start
+## Quick Start / 快速开始
 
-### Install
+### Install / 安装
+
+**推荐方式 / Recommended:**
+
+```bash
+openclaw skill install https://github.com/AntalphaAI/web3-trader
+```
+
+**手动克隆 / Manual Clone:**
 
 ```bash
 git clone https://github.com/AntalphaAI/web3-trader.git
@@ -143,21 +161,21 @@ cd web3-trader
 bash install.sh
 ```
 
-### MCP Remote Mode (Recommended)
+### MCP Remote Mode (Recommended / 推荐)
 
-No local setup needed. Configure in OpenClaw:
+No local setup needed. Configure in OpenClaw / 无需本地配置，直接在 OpenClaw 中添加：
 
 ```
 MCP Server: https://mcp-skills.ai.antalpha.com/mcp
 ```
 
-### v1 — DEX Swap Example
+### v1 — DEX Swap Example / 兑换示例
 
 ```bash
-# Query price
+# Query price / 查询价格
 python3 scripts/trader_cli.py price --from ETH --to USDT --amount 0.1
 
-# Generate swap page
+# Generate swap page / 生成兑换页面
 python3 scripts/trader_cli.py swap-page --from ETH --to USDT --amount 0.1 \
   --wallet 0xYourAddress -o swap.html --json
 ```
@@ -165,61 +183,63 @@ python3 scripts/trader_cli.py swap-page --from ETH --to USDT --amount 0.1 \
 ### v2 — Hyperliquid CLI
 
 ```bash
-# Set up agent wallet
+# Set up agent wallet / 配置 Agent 钱包
 cp references/config.example.yaml ~/.web3-trader/config.yaml
 
-# Check price
+# Check price / 查询价格
 python3 scripts/hl_cli.py price ETH
 
-# Place limit order
+# Place limit order / 下限价单
 python3 scripts/hl_cli.py limit-order --symbol ETH --side buy --price 2000 --size 0.01
 
-# Open perpetual long
+# Open perpetual long / 开多
 python3 scripts/hl_cli.py market-order --symbol ETH --side buy --size 0.01 --leverage 5
 
-# View positions
+# View positions / 查看持仓
 python3 scripts/hl_cli.py positions
 
-# Close position
+# Close position / 平仓
 python3 scripts/hl_cli.py close --symbol ETH
 ```
 
 ---
 
-## v2 Feature Details
+## v2 Feature Details / v2 功能详解
 
-### Agent Wallet (Zero Custody)
+### Agent Wallet (Zero Custody / 零托管)
 
 User signs `approveAgent` once via `scripts/hl_approve_agent.html`. After that, the AI agent can trade autonomously — private keys never leave the user's wallet.
+
+用户通过 `scripts/hl_approve_agent.html` 一次性签名 `approveAgent`，之后 AI Agent 即可自主交易——私钥始终不离开用户钱包。
 
 ```
 User → MetaMask → sign approveAgent (EIP-712)
                        ↓
-              Agent Wallet activated
+              Agent Wallet activated / Agent 钱包激活
                        ↓
 AI Agent → hl-limit-order / hl-market-order → Hyperliquid CLOB
 ```
 
-### 3-Tier Risk Control (v2.0.1)
+### 3-Tier Risk Control (v2.0.1) / 三级风控
 
-| Trade Value | Confirmation Required |
+| Trade Value / 交易金额 | Confirmation Required / 确认方式 |
 |-------------|----------------------|
-| < $100 | Auto-execute |
-| $100 – $999 | Single confirmation |
-| ≥ $1000 or ≥ 10x leverage | Double confirmation |
+| < $100 | Auto-execute / 自动执行 |
+| $100 – $999 | Single confirmation / 单次确认 |
+| ≥ $1000 or ≥ 10x leverage / ≥ $1000 或 ≥ 10 倍杠杆 | Double confirmation / 双重确认 |
 
-### Supported Trading Pairs
+### Supported Trading Pairs / 支持的交易对
 
-| Category | Examples |
-|----------|---------|
-| Perpetuals | BTC, ETH, SOL, ARB, and 225+ more |
-| Leverage | Up to 40x (pair-dependent) |
+| Category / 类别 | Examples / 示例 |
+|----------|---------| 
+| Perpetuals / 永续合约 | BTC, ETH, SOL, ARB, and 225+ more / 等 225+ 交易对 |
+| Leverage / 杠杆倍数 | Up to 40x (pair-dependent) / 最高 40 倍（视交易对而定） |
 
 ---
 
-## Supported Wallets
+## Supported Wallets / 支持的钱包
 
-| Wallet | Protocol | Status |
+| Wallet / 钱包 | Protocol | Status / 状态 |
 |--------|----------|--------|
 | 🦊 MetaMask | `metamask.app.link/dapp/` | ✅ Verified |
 | 💎 OKX Web3 | `okx://wallet/dapp/details` | ✅ Verified |
@@ -228,29 +248,29 @@ AI Agent → hl-limit-order / hl-market-order → Hyperliquid CLOB
 
 ---
 
-## Project Structure
+## Project Structure / 项目结构
 
 ```
-├── SKILL.md                        # Full skill spec (read by AI agent)
-├── README.md                       # This file
-├── requirements.txt                # Python dependencies
-├── install.sh                      # One-click install script
+├── SKILL.md                        # Full skill spec (read by AI agent) / AI Agent 完整 Skill 规范
+├── README.md                       # This file / 本文件
+├── requirements.txt                # Python dependencies / Python 依赖
+├── install.sh                      # One-click install script / 一键安装脚本
 ├── scripts/
-│   ├── trader_cli.py               # v1 Swap CLI entry point
-│   ├── zeroex_client.py            # Antalpha AI DEX API client
-│   ├── swap_page_gen.py            # Cyberpunk swap page generator
-│   ├── hl_client.py                # v2 Hyperliquid API client (agent wallet)
-│   ├── hl_cli.py                   # v2 Hyperliquid CLI (18 commands)
-│   ├── hl_risk.py                  # v2.0.1 Risk engine (3-tier + balance check)
-│   ├── hl_approve_agent.html       # Agent Wallet authorization page
-│   └── hl_transfer.html            # Spot↔Perp transfer page
+│   ├── trader_cli.py               # v1 Swap CLI entry point / v1 兑换 CLI 入口
+│   ├── zeroex_client.py            # Antalpha AI DEX API client / Antalpha AI DEX API 客户端
+│   ├── swap_page_gen.py            # Cyberpunk swap page generator / 赛博朋克兑换页面生成器
+│   ├── hl_client.py                # v2 Hyperliquid API client (agent wallet) / v2 Hyperliquid API 客户端
+│   ├── hl_cli.py                   # v2 Hyperliquid CLI (18 commands) / v2 Hyperliquid CLI（18 条命令）
+│   ├── hl_risk.py                  # v2.0.1 Risk engine (3-tier + balance check) / v2.0.1 风控引擎
+│   ├── hl_approve_agent.html       # Agent Wallet authorization page / Agent 钱包授权页面
+│   └── hl_transfer.html            # Spot↔Perp transfer page / 现货↔永续划转页面
 ├── references/
-│   ├── config.example.yaml         # Config template
-│   ├── HL_MCP_TOOLS_SPEC.md        # Hyperliquid MCP tools spec
-│   ├── ANTALPHA_MCP_SERVER_SPEC.md # Antalpha MCP server spec
-│   └── SECURITY.md                 # Security documentation
+│   ├── config.example.yaml         # Config template / 配置模板
+│   ├── HL_MCP_TOOLS_SPEC.md        # Hyperliquid MCP tools spec / Hyperliquid MCP 工具规范
+│   ├── ANTALPHA_MCP_SERVER_SPEC.md # Antalpha MCP server spec / Antalpha MCP 服务规范
+│   └── SECURITY.md                 # Security documentation / 安全文档
 ├── examples/
-│   └── swap_usdt_eth.py            # Example swap script
+│   └── swap_usdt_eth.py            # Example swap script / 兑换示例脚本
 └── tests/
     ├── test_zeroex_client.py
     ├── test_hl_client.py
@@ -259,20 +279,20 @@ AI Agent → hl-limit-order / hl-market-order → Hyperliquid CLOB
 
 ---
 
-## Security
+## Security / 安全性
 
-| Layer | Protection |
-|-------|-----------|
-| Private Keys | **Zero contact** — skill never holds, transmits, or stores any private key |
-| Agent Wallet | EIP-712 signed authorization, user controls permissions |
-| Transaction Data | Generated by 0x Protocol with MEV protection (anti-sandwich) |
-| Slippage | Configurable max slippage (default 0.5%), `minBuyAmount` enforced on-chain |
-| Risk Control | 3-tier confirmation prevents accidental large trades |
-| Swap Pages | Self-contained HTML, no backend communication, no cookies, no tracking |
+| Layer / 层级 | Protection / 防护措施 |
+|-------|-----------| 
+| Private Keys / 私钥 | **Zero contact** — skill never holds, transmits, or stores any private key / **零接触**——Skill 从不持有、传输或存储任何私钥 |
+| Agent Wallet / Agent 钱包 | EIP-712 signed authorization, user controls permissions / EIP-712 签名授权，用户掌控权限 |
+| Transaction Data / 交易数据 | Generated by 0x Protocol with MEV protection (anti-sandwich) / 由 0x 协议生成，含 MEV 保护（防三明治攻击） |
+| Slippage / 滑点 | Configurable max slippage (default 0.5%), `minBuyAmount` enforced on-chain / 可配置最大滑点（默认 0.5%），链上强制 `minBuyAmount` |
+| Risk Control / 风控 | 3-tier confirmation prevents accidental large trades / 三级确认机制防止误操作大额交易 |
+| Swap Pages / 兑换页面 | Self-contained HTML, no backend communication, no cookies, no tracking / 独立 HTML，无后端通信，无 Cookie，无追踪 |
 
 ---
 
-## Changelog
+## Changelog / 更新日志
 
 ### v2.0.3 (2026-04-07)
 - ✅ **MCP Tools full rollout** — 24 tools fully configured (swap ×5 + smart-swap ×4 + hl ×15)
@@ -311,7 +331,7 @@ AI Agent → hl-limit-order / hl-market-order → Hyperliquid CLOB
 - **[P1]** Add missing `pyyaml` to `requirements.txt`
 - **[P2]** Use `Decimal` for amount calculations instead of `float`
 - **[P2]** Deduplicate `get_token_address` (alias to `_resolve_token`) and extract shared logic in `cmd_price`/`cmd_route`
-- **[P2]** Fix HTML `lang="zh"` → `lang="en"`
+- **[P2]** Fix HTML `lang=\"zh\"` → `lang=\"en\"`
 
 ### v1.0.3 (2026-03-28)
 - Fix: `metadata` changed from multi-line YAML to single-line JSON (OpenClaw parser requirement)
