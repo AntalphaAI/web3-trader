@@ -21,6 +21,12 @@
 openclaw skill install https://github.com/AntalphaAI/web3-trader
 ```
 
+### Install via ClawHub
+
+```bash
+clawhub install web3-trader
+```
+
 ## Features
 
 ### v1 — DEX Swap (Antalpha AI Aggregator)
