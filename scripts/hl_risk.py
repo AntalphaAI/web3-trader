@@ -275,7 +275,17 @@ def check_balance_sufficient(
     margin = state.get("marginSummary", {})
     account_value = float(margin.get("accountValue", "0"))
     total_margin_used = float(margin.get("totalMarginUsed", "0"))
-    withdrawable = float(state.get("withdrawable", "0"))
+
+    # Unified Account: also count Spot USDC as available margin
+    spot_usdc = 0.0
+    try:
+        spot_state = client.get_spot_state(address)
+        spot_usdc = sum(
+            float(b.get("total", "0")) for b in spot_state.get("balances", [])
+            if b.get("coin") == "USDC"
+        )
+    except Exception:
+        pass  # Non-fatal: proceed with perp balance only
 
     # Estimate required margin
     notional = abs(size) * price
@@ -283,21 +293,22 @@ def check_balance_sufficient(
     # Rough margin estimate: notional / leverage + some buffer for fees
     required_margin = (notional / effective_leverage) * 1.02  # 2% buffer for fees
 
-    available_margin = account_value - total_margin_used
+    available_margin = (account_value - total_margin_used) + spot_usdc
 
     if available_margin < required_margin:
         return False, (
             f"❌ 保证金不足\n"
-            f"   账户价值: ${account_value:,.2f}\n"
+            f"   Perp 账户价值: ${account_value:,.2f}\n"
             f"   已用保证金: ${total_margin_used:,.2f}\n"
-            f"   可用保证金: ${available_margin:,.2f}\n"
+            f"   Spot USDC: ${spot_usdc:,.2f}\n"
+            f"   合计可用: ${available_margin:,.2f}\n"
             f"   预估所需: ${required_margin:,.2f}\n"
             f"   缺口: ${required_margin - available_margin:,.2f}"
         )
 
     return True, (
         f"✅ 保证金充足\n"
-        f"   可用: ${available_margin:,.2f} | 预估所需: ${required_margin:,.2f}"
+        f"   可用: ${available_margin:,.2f} (Perp: ${account_value - total_margin_used:,.2f} + Spot USDC: ${spot_usdc:,.2f}) | 预估所需: ${required_margin:,.2f}"
     )
 
 
