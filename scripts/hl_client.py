@@ -262,7 +262,7 @@ class HyperliquidClient:
     ) -> Dict:
         """Place a take-profit or stop-loss trigger order."""
         exchange = self._get_exchange()
-        trigger = {"triggerPx": str(trigger_px), "isMarket": True, "tpsl": tpsl}
+        trigger = {"triggerPx": float(trigger_px), "isMarket": True, "tpsl": tpsl}
         order_type_obj = {"trigger": trigger}
         return exchange.order(coin, is_buy, size, trigger_px, order_type_obj, reduce_only=True)
 
