@@ -8,7 +8,7 @@ All Hyperliquid tools prefixed with `hl-` to avoid collision with existing `swap
 
 ## Tools
 
-### 1. `hl-price` — Get asset price(s)
+### 1. `hyperliquid-price` — Get asset price(s)
 
 **Input:**
 ```json
@@ -28,7 +28,7 @@ All Hyperliquid tools prefixed with `hl-` to avoid collision with existing `swap
 
 ---
 
-### 2. `hl-account` — Get account summary
+### 2. `hyperliquid-account` — Get account summary
 
 **Input:**
 ```json
@@ -49,7 +49,7 @@ All Hyperliquid tools prefixed with `hl-` to avoid collision with existing `swap
 
 ---
 
-### 3. `hl-book` — Get L2 order book
+### 3. `hyperliquid-book` — Get L2 order book
 
 **Input:**
 ```json
@@ -61,7 +61,7 @@ All Hyperliquid tools prefixed with `hl-` to avoid collision with existing `swap
 
 ---
 
-### 4. `hl-limit-order` — Place a limit order
+### 4. `hyperliquid-limit-order` — Place a limit order
 
 **Input:**
 ```json
@@ -86,7 +86,7 @@ All Hyperliquid tools prefixed with `hl-` to avoid collision with existing `swap
 
 ---
 
-### 5. `hl-market-order` — Place a market order
+### 5. `hyperliquid-market-order` — Place a market order
 
 **Input:**
 ```json
@@ -100,7 +100,7 @@ All Hyperliquid tools prefixed with `hl-` to avoid collision with existing `swap
 
 ---
 
-### 6. `hl-close` — Close a position at market
+### 6. `hyperliquid-close` — Close a position at market
 
 **Input:**
 ```json
@@ -112,7 +112,7 @@ All Hyperliquid tools prefixed with `hl-` to avoid collision with existing `swap
 
 ---
 
-### 7. `hl-cancel` — Cancel an order
+### 7. `hyperliquid-cancel` — Cancel an order
 
 **Input:**
 ```json
@@ -124,7 +124,7 @@ All Hyperliquid tools prefixed with `hl-` to avoid collision with existing `swap
 
 ---
 
-### 8. `hl-leverage` — Set leverage
+### 8. `hyperliquid-leverage` — Set leverage
 
 **Input:**
 ```json
@@ -137,7 +137,7 @@ All Hyperliquid tools prefixed with `hl-` to avoid collision with existing `swap
 
 ---
 
-### 9. `hl-tp-sl` — Place take-profit / stop-loss
+### 9. `hyperliquid-tp-sl` — Place take-profit / stop-loss
 
 **Input:**
 ```json
@@ -152,7 +152,7 @@ All Hyperliquid tools prefixed with `hl-` to avoid collision with existing `swap
 
 ---
 
-### 10. `hl-funding` — Get funding rates
+### 10. `hyperliquid-funding` — Get funding rates
 
 **Input:**
 ```json
@@ -163,7 +163,7 @@ All Hyperliquid tools prefixed with `hl-` to avoid collision with existing `swap
 
 ---
 
-### 11. `hl-orders` — Get open orders
+### 11. `hyperliquid-orders` — Get open orders
 
 **Input:**
 ```json
@@ -174,7 +174,7 @@ All Hyperliquid tools prefixed with `hl-` to avoid collision with existing `swap
 
 ---
 
-### 12. `hl-positions` — Get open positions
+### 12. `hyperliquid-positions` — Get open positions
 
 **Input:**
 ```json
@@ -187,13 +187,13 @@ All Hyperliquid tools prefixed with `hl-` to avoid collision with existing `swap
 
 ## Authentication
 
-For write operations (hl-limit-order, hl-market-order, hl-close, hl-cancel, hl-leverage, hl-tp-sl):
+For write operations (hyperliquid-limit-order, hyperliquid-market-order, hyperliquid-close, hyperliquid-cancel, hyperliquid-leverage, hyperliquid-tp-sl):
 
 - Server-side uses Agent Wallet mode
 - Agent key stored securely on MCP server (per-user)
 - Owner address associated via `hl-authorize` setup flow
 
-For read operations (hl-price, hl-account, hl-book, hl-funding, hl-orders, hl-positions):
+For read operations (hyperliquid-price, hyperliquid-account, hyperliquid-book, hyperliquid-funding, hyperliquid-orders, hyperliquid-positions):
 - No authentication needed
 
 ## NestJS Implementation Notes

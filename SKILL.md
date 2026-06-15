@@ -1,8 +1,8 @@
 ---
 name: web3-trader
-version: 2.0.3
+version: 2.0.4
 description: DEX swap 交易技能。当用户提到 swap、兑换、卖出、买入、换成 USDT、交易 ETH、DEX 交易、代币兑换、token swap、sell ETH、buy USDT、交易代币、限价单、limit order、挂单、永续合约、perpetual、开多、开空、做多、做空、杠杆、leverage、止盈、止损、Hyperliquid、平仓、close position、查持仓、funding rate、资金费率、风控、risk control 等关键词时激活。v1 通过 Antalpha AI DEX 聚合器做即时 Swap；v2 新增 Hyperliquid CLOB 限价单、永续合约、Agent Wallet 零托管签名。v2.0.1 新增三级风控确认、余额预检、订单修改、下单失败容错。支持 MetaMask/OKX/Trust/TokenPocket 四大钱包。零托管，私钥不离开用户钱包。
-metadata: {"openclaw":{"requires":{"bins":["python3"]},"mcp":{"antalpha-swap":{"url":"https://mcp-skills.ai.antalpha.com/mcp","tools":["swap-quote","swap-create-page","swap-tokens","swap-gas","swap-full","smart-swap-create","smart-swap-list","smart-swap-status","smart-swap-cancel","hl-price","hl-account","hl-book","hl-orders","hl-positions","hl-funding","hl-balance-check","hl-limit-order","hl-market-order","hl-close","hl-cancel","hl-leverage","hl-tp-sl","hl-modify-order"]}},"persistence":{"path":"~/.web3-trader/"},"security_notes":["本 Skill 仅生成交易数据，绝不接触私钥","用户必须在自己的钱包中审核并签名交易","交易涉及风险（滑点、Gas 波动、清算）— 请只用闲钱交易"]}}
+metadata: {"openclaw":{"requires":{"bins":["python3"]},"mcp":{"antalpha-swap":{"url":"https://mcp-skills.ai.antalpha.com/mcp","tools":["swap-quote","swap-create-page","swap-tokens","swap-gas","swap-full","smart-swap-create","smart-swap-list","smart-swap-status","smart-swap-cancel","hyperliquid-price","hyperliquid-account","hyperliquid-book","hyperliquid-orders","hyperliquid-positions","hyperliquid-funding","hyperliquid-balance-check","hyperliquid-limit-order","hyperliquid-market-order","hyperliquid-close","hyperliquid-cancel","hyperliquid-leverage","hyperliquid-tp-sl","hyperliquid-modify-order"]}},"persistence":{"path":"~/.web3-trader/"},"security_notes":["本 Skill 仅生成交易数据，绝不接触私钥","用户必须在自己的钱包中审核并签名交易","交易涉及风险（滑点、Gas 波动、清算）— 请只用闲钱交易"]}}
 ---
 
 # Web3 Trader Skill
@@ -611,6 +611,10 @@ python3 scripts/hl_cli.py modify-order ETH <oid> buy <new_price> <new_size>
 cd scripts && python3 -m http.server 8199 --bind 127.0.0.1 &
 cloudflared tunnel --url http://127.0.0.1:8199
 ```
+
+### Changelog v2.0.4 (2026-06-15)
+- ✅ **MCP 工具名同步改名** — 14 个永续工具 `hl-*` → `hyperliquid-*`，与线上 MCP（`mcp-skills.ai.antalpha.com/mcp`）对齐，修复改名后经 MCP 路由的永续调用因工具名不存在而断引用的问题
+- ✅ **文档工具计数修正** — 工具总数 24→23、Hyperliquid 15→14（实际 14 个工具，与 v2.0.2 已修正口径一致）
 
 ### Changelog v2.0.3 (2026-04-07)
 - ✅ **MCP Tools 全量上线** — 24 个工具完整配置（swap 5 个 + smart-swap 4 个 + hl 15 个）

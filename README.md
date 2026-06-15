@@ -9,7 +9,7 @@
 
 <a name="english"></a>
 
-# 🔄 Web3 Trader Skill v2.0.3
+# 🔄 Web3 Trader Skill v2.0.4
 
 > **AI-Native DEX Trading + Hyperliquid Perp | Zero Custody | Multi-Wallet | Cyberpunk UI**
 >
@@ -58,7 +58,7 @@ clawhub install web3-trader
 https://mcp-skills.ai.antalpha.com/mcp
 ```
 
-### Available MCP Tools (24 total)
+### Available MCP Tools (23 total)
 
 #### v1 — DEX Swap (5 tools)
 
@@ -79,24 +79,24 @@ https://mcp-skills.ai.antalpha.com/mcp
 | `smart-swap-status` | Query smart swap order status |
 | `smart-swap-cancel` | Cancel a smart swap order |
 
-#### v2 — Hyperliquid (15 tools)
+#### v2 — Hyperliquid (14 tools)
 
 | Tool | Description |
 |------|-------------|
-| `hl-price` | Real-time price for any trading pair |
-| `hl-account` | Account info (balance, margin, equity) |
-| `hl-book` | Order book depth |
-| `hl-orders` | List open orders |
-| `hl-positions` | List open positions |
-| `hl-funding` | Funding rate rankings |
-| `hl-balance-check` | Pre-trade balance check (spot or perp) |
-| `hl-limit-order` | Place CLOB limit order |
-| `hl-market-order` | Place perpetual market order |
-| `hl-close` | One-click market close position |
-| `hl-cancel` | Cancel open order |
-| `hl-leverage` | Set leverage for a trading pair |
-| `hl-tp-sl` | Set take-profit / stop-loss trigger orders |
-| `hl-modify-order` | Atomically modify price and size of open order |
+| `hyperliquid-price` | Real-time price for any trading pair |
+| `hyperliquid-account` | Account info (balance, margin, equity) |
+| `hyperliquid-book` | Order book depth |
+| `hyperliquid-orders` | List open orders |
+| `hyperliquid-positions` | List open positions |
+| `hyperliquid-funding` | Funding rate rankings |
+| `hyperliquid-balance-check` | Pre-trade balance check (spot or perp) |
+| `hyperliquid-limit-order` | Place CLOB limit order |
+| `hyperliquid-market-order` | Place perpetual market order |
+| `hyperliquid-close` | One-click market close position |
+| `hyperliquid-cancel` | Cancel open order |
+| `hyperliquid-leverage` | Set leverage for a trading pair |
+| `hyperliquid-tp-sl` | Set take-profit / stop-loss trigger orders |
+| `hyperliquid-modify-order` | Atomically modify price and size of open order |
 
 ## Architecture
 
@@ -129,7 +129,7 @@ https://mcp-skills.ai.antalpha.com/mcp
 ```
 ┌──────────────┐    MCP JSON-RPC    ┌──────────────────────────────────┐
 │  AI Agent    │ ──────────────────► │  Antalpha MCP Server              │
-│  (OpenClaw)  │  hl-limit-order     │  mcp-skills.ai.antalpha.com       │
+│  (OpenClaw)  │  hyperliquid-limit-order     │  mcp-skills.ai.antalpha.com       │
 │              │ ◄────────────────── │                                    │
 │              │  order_id + status  │  ├─ hl_client.py ── Agent Wallet  │
 └──────────────┘                     │  ├─ hl_risk.py ── 3-tier risk     │
@@ -206,7 +206,7 @@ User → MetaMask → sign approveAgent (EIP-712)
                        ↓
               Agent Wallet activated
                        ↓
-AI Agent → hl-limit-order / hl-market-order → Hyperliquid CLOB
+AI Agent → hyperliquid-limit-order / hyperliquid-market-order → Hyperliquid CLOB
 ```
 
 ### 3-Tier Risk Control (v2.0.1)
@@ -275,6 +275,10 @@ AI Agent → hl-limit-order / hl-market-order → Hyperliquid CLOB
 
 ## Changelog
 
+### v2.0.4 (2026-06-15)
+- ✅ MCP tool rename sync — 14 perpetual tools `hl-*` → `hyperliquid-*`, aligned with live MCP (`mcp-skills.ai.antalpha.com/mcp`); fixes perpetual calls breaking after the rename because the old tool names no longer exist
+- ✅ Doc tool-count fix — total 24→23, Hyperliquid 15→14 (14 tools actual, matching the v2.0.2 correction)
+
 ### v2.0.3 (2026-04-07)
 - ✅ MCP Tools full rollout — 24 tools fully configured (swap ×5 + smart-swap ×4 + hl ×15)
 - ✅ SKILL.md comprehensive update — added full Hyperliquid feature docs, 3-tier risk control, balance check, fail-safe recovery
@@ -317,7 +321,7 @@ MIT · Powered by Antalpha AI
 
 <a name="chinese"></a>
 
-# 🔄 Web3 Trader Skill v2.0.3（中文文档）
+# 🔄 Web3 Trader Skill v2.0.4（中文文档）
 
 > **AI 原生 DEX 交易 + Hyperliquid 永续合约 | 零托管 | 多钱包支持 | 赛博朋克 UI**
 >
@@ -366,7 +370,7 @@ clawhub install web3-trader
 https://mcp-skills.ai.antalpha.com/mcp
 ```
 
-### MCP 工具列表（共 24 个）
+### MCP 工具列表（共 23 个）
 
 #### v1 — DEX Swap（5 个工具）
 
@@ -387,24 +391,24 @@ https://mcp-skills.ai.antalpha.com/mcp
 | `smart-swap-status` | 查询智能兑换订单状态 |
 | `smart-swap-cancel` | 取消智能兑换订单 |
 
-#### v2 — Hyperliquid（15 个工具）
+#### v2 — Hyperliquid（14 个工具）
 
 | 工具 | 说明 |
 |------|------|
-| `hl-price` | 任意交易对实时价格 |
-| `hl-account` | 账户信息（余额、保证金、净值） |
-| `hl-book` | 订单簿深度 |
-| `hl-orders` | 查看挂单列表 |
-| `hl-positions` | 查看持仓列表 |
-| `hl-funding` | 资金费率排行 |
-| `hl-balance-check` | 交易前余额检查（现货或永续） |
-| `hl-limit-order` | 挂限价单 |
-| `hl-market-order` | 下永续合约市价单 |
-| `hl-close` | 一键市价平仓 |
-| `hl-cancel` | 撤销挂单 |
-| `hl-leverage` | 设置交易对杠杆倍数 |
-| `hl-tp-sl` | 设置止盈止损触发单 |
-| `hl-modify-order` | 原子性修改挂单价格和数量 |
+| `hyperliquid-price` | 任意交易对实时价格 |
+| `hyperliquid-account` | 账户信息（余额、保证金、净值） |
+| `hyperliquid-book` | 订单簿深度 |
+| `hyperliquid-orders` | 查看挂单列表 |
+| `hyperliquid-positions` | 查看持仓列表 |
+| `hyperliquid-funding` | 资金费率排行 |
+| `hyperliquid-balance-check` | 交易前余额检查（现货或永续） |
+| `hyperliquid-limit-order` | 挂限价单 |
+| `hyperliquid-market-order` | 下永续合约市价单 |
+| `hyperliquid-close` | 一键市价平仓 |
+| `hyperliquid-cancel` | 撤销挂单 |
+| `hyperliquid-leverage` | 设置交易对杠杆倍数 |
+| `hyperliquid-tp-sl` | 设置止盈止损触发单 |
+| `hyperliquid-modify-order` | 原子性修改挂单价格和数量 |
 
 ## 快速开始
 
@@ -472,7 +476,7 @@ python3 scripts/hl_cli.py close --symbol ETH
                        ↓
               Agent 钱包激活
                        ↓
-AI Agent → hl-limit-order / hl-market-order → Hyperliquid CLOB
+AI Agent → hyperliquid-limit-order / hyperliquid-market-order → Hyperliquid CLOB
 ```
 
 ### 三级风控（v2.0.1）
@@ -540,6 +544,10 @@ AI Agent → hl-limit-order / hl-market-order → Hyperliquid CLOB
 | 兑换页面 | 独立 HTML，无后端通信，无 Cookie，无追踪 |
 
 ## 更新日志
+
+### v2.0.4 (2026-06-15)
+- ✅ MCP 工具名同步改名——14 个永续工具 `hl-*` → `hyperliquid-*`，与线上 MCP 对齐，修复改名后永续调用断引用
+- ✅ 文档工具计数修正——工具总数 24→23、Hyperliquid 15→14
 
 ### v2.0.3 (2026-04-07)
 - ✅ MCP 工具全量上线——24 个工具完整配置（swap ×5 + smart-swap ×4 + hl ×15）
