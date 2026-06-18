@@ -1,6 +1,6 @@
 ---
 name: web3-trader
-version: 2.0.4
+version: 2.0.5
 description: DEX swap 交易技能。当用户提到 swap、兑换、卖出、买入、换成 USDT、交易 ETH、DEX 交易、代币兑换、token swap、sell ETH、buy USDT、交易代币、限价单、limit order、挂单、永续合约、perpetual、开多、开空、做多、做空、杠杆、leverage、止盈、止损、Hyperliquid、平仓、close position、查持仓、funding rate、资金费率、风控、risk control 等关键词时激活。v1 通过 Antalpha AI DEX 聚合器做即时 Swap；v2 新增 Hyperliquid CLOB 限价单、永续合约、Agent Wallet 零托管签名。v2.0.1 新增三级风控确认、余额预检、订单修改、下单失败容错。支持 MetaMask/OKX/Trust/TokenPocket 四大钱包。零托管，私钥不离开用户钱包。
 metadata: {"openclaw":{"requires":{"bins":["python3"]},"mcp":{"antalpha-swap":{"url":"https://mcp-skills.ai.antalpha.com/mcp","tools":["swap-quote","swap-create-page","swap-tokens","swap-gas","swap-full","smart-swap-create","smart-swap-list","smart-swap-status","smart-swap-cancel","hyperliquid-price","hyperliquid-account","hyperliquid-book","hyperliquid-orders","hyperliquid-positions","hyperliquid-funding","hyperliquid-balance-check","hyperliquid-limit-order","hyperliquid-market-order","hyperliquid-close","hyperliquid-cancel","hyperliquid-leverage","hyperliquid-tp-sl","hyperliquid-modify-order"]}},"persistence":{"path":"~/.web3-trader/"},"security_notes":["本 Skill 仅生成交易数据，绝不接触私钥","用户必须在自己的钱包中审核并签名交易","交易涉及风险（滑点、Gas 波动、清算）— 请只用闲钱交易"]}}
 ---
@@ -30,15 +30,63 @@ metadata: {"openclaw":{"requires":{"bins":["python3"]},"mcp":{"antalpha-swap":{"
 https://mcp-skills.ai.antalpha.com/mcp
 ```
 
+### 注册（首次必做）
+
+接入 MCP 后，先调用一次 `antalpha-register`（agent 包工具）：
+
+- **入参**：无
+- **返回**：`agent_id`（格式 `A` + 32 位十六进制）+ `created_at`
+
+将 `agent_id` 持久化保存（如 `~/.web3-trader/`），供后续调用与排障使用。
+
 ### 可用 MCP Tools
 
-| Tool | 说明 |
-|------|------|
-| `swap-quote` | DEX 聚合报价（无 taker = 询价；有 taker = 含完整 tx data） |
-| `swap-create-page` | 生成赛博朋克 Swap 页面（服务端托管，返回 preview_url） |
-| `swap-tokens` | 支持的代币列表（可按符号/名称搜索） |
-| `swap-gas` | 当前 Gas 价格 |
-| `swap-full` | **一站式**：报价 + 生成页面 + 托管（单次调用，推荐） |
+#### DEX 即时兑换（swap）
+
+| Tool | 说明 | 主要参数 |
+|------|------|----------|
+| `swap-quote` | DEX 聚合报价（无 `taker` = 询价；有 `taker` = 含完整 tx data） | `sell_token`, `buy_token`, `sell_amount`, `taker?`, `chain_id?` |
+| `swap-tokens` | 支持的代币列表（可按符号/名称搜索） | `search?`, `chain_id?` |
+| `swap-gas` | 当前 Gas 价格 | `chain_id?` |
+| `swap-full` | **一站式**：报价 + 生成页面 + 托管（单次调用，推荐） | `sell_token`, `buy_token`, `sell_amount`, `taker`, `chain_id?`, `hosted_url?` |
+| `swap-create-page` | 仅生成赛博朋克 Swap 页面（服务端托管，返回 `preview_url`） | `sell_token`, `buy_token`, `sell_amount`, `taker`, `chain_id?`, `hosted_url?` |
+
+#### 智能委托单（限价 / 1inch Fusion）
+
+| Tool | 说明 | 主要参数 |
+|------|------|----------|
+| `smart-swap-create` | 创建限价委托单，生成签名页面（返回 `order_hash` + `preview_url`） | `sell_token`, `buy_token`, `sell_amount`, `target_price`, `wallet`, `expiry?`, `engine?`, `chain_id?` |
+| `smart-swap-status` | 查询单个委托单状态 | `order_hash`, `chain_id?` |
+| `smart-swap-list` | 列出某钱包的全部委托单 | `wallet`, `chain_id?` |
+| `smart-swap-cancel` | 取消委托单（返回链上 / 等待过期两种方式） | `order_hash`, `wallet`, `chain_id?` |
+
+> 说明：智能委托单当前仅支持 `engine=1inch`（默认）与 `chain_id=1`（以太坊主网）。`target_price` 为「每 1 个 sell_token 兑换多少 buy_token」的纯数字字符串。
+
+#### Hyperliquid 永续合约
+
+查询类（无需密钥）：
+
+| Tool | 说明 | 主要参数 |
+|------|------|----------|
+| `hyperliquid-price` | 行情价格（单币 / 逗号分隔多币 / 缺省返回 Top-10） | `coin?` |
+| `hyperliquid-book` | 订单簿深度 | `coin`, `depth?`(1–50, 默认 10) |
+| `hyperliquid-funding` | 资金费率排行 | `limit?`(1–100, 默认 20) |
+| `hyperliquid-account` | 账户摘要 | `address` |
+| `hyperliquid-positions` | 当前持仓 | `address` |
+| `hyperliquid-orders` | 当前挂单 | `address` |
+| `hyperliquid-balance-check` | 下单前余额 / 保证金预检 | `address`, `coin`, `size`, `price`, `leverage?`, `order_type?`(spot/perp/auto), `is_buy?` |
+
+交易类（需 `agent_key` + `owner`）：
+
+| Tool | 说明 | 主要参数 |
+|------|------|----------|
+| `hyperliquid-leverage` | 设置杠杆与保证金模式 | `agent_key`, `owner`, `coin`, `leverage`(1–100), `mode?`(cross/isolated) |
+| `hyperliquid-market-order` | 市价单 | `agent_key`, `owner`, `coin`, `side`(buy/sell), `size`, `slippage?` |
+| `hyperliquid-limit-order` | 限价单（CLOB 挂单） | `agent_key`, `owner`, `coin`, `side`, `price`, `size`, `tif?`(Gtc/Ioc/Alo), `reduce_only?` |
+| `hyperliquid-modify-order` | 原子改单（改价 / 改量） | `agent_key`, `owner`, `coin`, `oid`, `side`, `price`, `size`, `tif?` |
+| `hyperliquid-cancel` | 撤单 | `agent_key`, `owner`, `coin`, `oid` |
+| `hyperliquid-close` | 一键市价平仓 | `agent_key`, `owner`, `coin`, `slippage?` |
+| `hyperliquid-tp-sl` | 止盈 / 止损触发单 | `agent_key`, `owner`, `coin`, `type`(tp/sl), `side`, `trigger_price`, `size` |
 
 ### Agent 工作流（MCP 模式，推荐）
 
@@ -611,6 +659,11 @@ python3 scripts/hl_cli.py modify-order ETH <oid> buy <new_price> <new_size>
 cd scripts && python3 -m http.server 8199 --bind 127.0.0.1 &
 cloudflared tunnel --url http://127.0.0.1:8199
 ```
+
+### Changelog v2.0.5 (2026-06-18)
+- ✅ **MCP 工具表全量对齐** — 在「可用 MCP Tools」补齐 smart-swap（限价委托单 4 个）与 Hyperliquid 永续（14 个）的完整工具表与参数，与线上 `origin/main` 的 `inputSchema` 逐项核对
+- ✅ **新增注册说明** — 补充首次必做的 `antalpha-register` 流程（无入参，返回 `agent_id`）
+- ✅ **端点统一确认** — 全文仅保留 `https://mcp-skills.ai.antalpha.com/mcp`，无旧分域端点
 
 ### Changelog v2.0.4 (2026-06-15)
 - ✅ **MCP 工具名同步改名** — 14 个永续工具 `hl-*` → `hyperliquid-*`，与线上 MCP（`mcp-skills.ai.antalpha.com/mcp`）对齐，修复改名后经 MCP 路由的永续调用因工具名不存在而断引用的问题
