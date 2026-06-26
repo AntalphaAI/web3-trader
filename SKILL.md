@@ -1,8 +1,8 @@
 ---
 name: web3-trader
-version: 2.0.5
+version: 2.0.6
 description: DEX swap 交易技能。当用户提到 swap、兑换、卖出、买入、换成 USDT、交易 ETH、DEX 交易、代币兑换、token swap、sell ETH、buy USDT、交易代币、限价单、limit order、挂单、永续合约、perpetual、开多、开空、做多、做空、杠杆、leverage、止盈、止损、Hyperliquid、平仓、close position、查持仓、funding rate、资金费率、风控、risk control 等关键词时激活。v1 通过 Antalpha AI DEX 聚合器做即时 Swap；v2 新增 Hyperliquid CLOB 限价单、永续合约、Agent Wallet 零托管签名。v2.0.1 新增三级风控确认、余额预检、订单修改、下单失败容错。支持 MetaMask/OKX/Trust/TokenPocket 四大钱包。零托管，私钥不离开用户钱包。
-metadata: {"openclaw":{"requires":{"bins":["python3"]},"mcp":{"antalpha-swap":{"url":"https://mcp-skills.ai.antalpha.com/mcp","tools":["swap-quote","swap-create-page","swap-tokens","swap-gas","swap-full","smart-swap-create","smart-swap-list","smart-swap-status","smart-swap-cancel","hyperliquid-price","hyperliquid-account","hyperliquid-book","hyperliquid-orders","hyperliquid-positions","hyperliquid-funding","hyperliquid-balance-check","hyperliquid-limit-order","hyperliquid-market-order","hyperliquid-close","hyperliquid-cancel","hyperliquid-leverage","hyperliquid-tp-sl","hyperliquid-modify-order"]}},"persistence":{"path":"~/.web3-trader/"},"security_notes":["本 Skill 仅生成交易数据，绝不接触私钥","用户必须在自己的钱包中审核并签名交易","交易涉及风险（滑点、Gas 波动、清算）— 请只用闲钱交易"]}}
+metadata: {"openclaw":{"requires":{"bins":["python3"]},"mcp":{"antalpha-swap":{"url":"https://mcp-skills.ai.antalpha.com/mcp","tools":["swap-quote","swap-create-page","swap-tokens","swap-gas","swap-full","smart-swap-create","smart-swap-list","smart-swap-status","smart-swap-cancel","hyperliquid-market","hyperliquid-account","hyperliquid-orders","hyperliquid-positions","hyperliquid-balance-check","hyperliquid-limit-order","hyperliquid-market-order","hyperliquid-close","hyperliquid-cancel","hyperliquid-leverage","hyperliquid-tp-sl","hyperliquid-modify-order"]}},"persistence":{"path":"~/.web3-trader/"},"security_notes":["本 Skill 仅生成交易数据，绝不接触私钥","用户必须在自己的钱包中审核并签名交易","交易涉及风险（滑点、Gas 波动、清算）— 请只用闲钱交易"]}}
 ---
 
 # Web3 Trader Skill
@@ -68,9 +68,7 @@ https://mcp-skills.ai.antalpha.com/mcp
 
 | Tool | 说明 | 主要参数 |
 |------|------|----------|
-| `hyperliquid-price` | 行情价格（单币 / 逗号分隔多币 / 缺省返回 Top-10） | `coin?` |
-| `hyperliquid-book` | 订单簿深度 | `coin`, `depth?`(1–50, 默认 10) |
-| `hyperliquid-funding` | 资金费率排行 | `limit?`(1–100, 默认 20) |
+| `hyperliquid-market` | 行情数据，`view` 参数三选一：`price`（默认，单币 / 逗号分隔多币 / 缺省返回 Top-10）、`book`（订单簿深度，需 `coin`、`depth?`(1–50, 默认 10)）、`funding`（资金费率排行，`limit?`(1–100, 默认 20)、`coin?`） | `view`(price/book/funding), `coin?`, `depth?`, `limit?` |
 | `hyperliquid-account` | 账户摘要 | `address` |
 | `hyperliquid-positions` | 当前持仓 | `address` |
 | `hyperliquid-orders` | 当前挂单 | `address` |
@@ -659,6 +657,9 @@ python3 scripts/hl_cli.py modify-order ETH <oid> buy <new_price> <new_size>
 cd scripts && python3 -m http.server 8199 --bind 127.0.0.1 &
 cloudflared tunnel --url http://127.0.0.1:8199
 ```
+
+### Changelog v2.0.6 (2026-06-26)
+- ✅ **行情工具合并** — `hyperliquid-price` + `hyperliquid-book` + `hyperliquid-funding` 合并为单个 `hyperliquid-market`，新增 `view` 参数（`price` 默认 / `book` 需 `coin`+`depth?` / `funding` 用 `limit?`+`coin?`），与线上 MCP 对齐；查询类工具 7→5、Hyperliquid 总数 14→12
 
 ### Changelog v2.0.5 (2026-06-18)
 - ✅ **MCP 工具表全量对齐** — 在「可用 MCP Tools」补齐 smart-swap（限价委托单 4 个）与 Hyperliquid 永续（14 个）的完整工具表与参数，与线上 `origin/main` 的 `inputSchema` 逐项核对
