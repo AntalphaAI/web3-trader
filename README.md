@@ -9,7 +9,7 @@
 
 <a name="english"></a>
 
-# 🔄 Web3 Trader Skill v2.0.4
+# 🔄 Web3 Trader Skill v2.0.6
 
 > **AI-Native DEX Trading + Hyperliquid Perp | Zero Custody | Multi-Wallet | Cyberpunk UI**
 >
@@ -58,7 +58,7 @@ clawhub install web3-trader
 https://mcp-skills.ai.antalpha.com/mcp
 ```
 
-### Available MCP Tools (23 total)
+### Available MCP Tools (21 total)
 
 #### v1 — DEX Swap (5 tools)
 
@@ -79,16 +79,14 @@ https://mcp-skills.ai.antalpha.com/mcp
 | `smart-swap-status` | Query smart swap order status |
 | `smart-swap-cancel` | Cancel a smart swap order |
 
-#### v2 — Hyperliquid (14 tools)
+#### v2 — Hyperliquid (12 tools)
 
 | Tool | Description |
 |------|-------------|
-| `hyperliquid-price` | Real-time price for any trading pair |
+| `hyperliquid-market` | Market data — `view=price` (default: single/CSV/Top-10), `view=book` (order book depth, needs `coin`+`depth?`), `view=funding` (funding rate rankings, `limit?`/`coin?`) |
 | `hyperliquid-account` | Account info (balance, margin, equity) |
-| `hyperliquid-book` | Order book depth |
 | `hyperliquid-orders` | List open orders |
 | `hyperliquid-positions` | List open positions |
-| `hyperliquid-funding` | Funding rate rankings |
 | `hyperliquid-balance-check` | Pre-trade balance check (spot or perp) |
 | `hyperliquid-limit-order` | Place CLOB limit order |
 | `hyperliquid-market-order` | Place perpetual market order |
@@ -275,6 +273,9 @@ AI Agent → hyperliquid-limit-order / hyperliquid-market-order → Hyperliquid 
 
 ## Changelog
 
+### v2.0.6 (2026-06-26)
+- ✅ Market tool merge — `hyperliquid-price` + `hyperliquid-book` + `hyperliquid-funding` merged into a single `hyperliquid-market` with a `view` param (`price` default / `book` needs `coin`+`depth?` / `funding` uses `limit?`+`coin?`); Hyperliquid count 14→12, total 23→21
+
 ### v2.0.4 (2026-06-15)
 - ✅ MCP tool rename sync — 14 perpetual tools `hl-*` → `hyperliquid-*`, aligned with live MCP (`mcp-skills.ai.antalpha.com/mcp`); fixes perpetual calls breaking after the rename because the old tool names no longer exist
 - ✅ Doc tool-count fix — total 24→23, Hyperliquid 15→14 (14 tools actual, matching the v2.0.2 correction)
@@ -321,7 +322,7 @@ MIT · Powered by Antalpha AI
 
 <a name="chinese"></a>
 
-# 🔄 Web3 Trader Skill v2.0.4（中文文档）
+# 🔄 Web3 Trader Skill v2.0.6（中文文档）
 
 > **AI 原生 DEX 交易 + Hyperliquid 永续合约 | 零托管 | 多钱包支持 | 赛博朋克 UI**
 >
@@ -370,7 +371,7 @@ clawhub install web3-trader
 https://mcp-skills.ai.antalpha.com/mcp
 ```
 
-### MCP 工具列表（共 23 个）
+### MCP 工具列表（共 21 个）
 
 #### v1 — DEX Swap（5 个工具）
 
@@ -391,16 +392,14 @@ https://mcp-skills.ai.antalpha.com/mcp
 | `smart-swap-status` | 查询智能兑换订单状态 |
 | `smart-swap-cancel` | 取消智能兑换订单 |
 
-#### v2 — Hyperliquid（14 个工具）
+#### v2 — Hyperliquid（12 个工具）
 
 | 工具 | 说明 |
 |------|------|
-| `hyperliquid-price` | 任意交易对实时价格 |
+| `hyperliquid-market` | 行情数据——`view=price`（默认：单币/逗号分隔多币/Top-10）、`view=book`（订单簿深度，需 `coin`+`depth?`）、`view=funding`（资金费率排行，`limit?`/`coin?`） |
 | `hyperliquid-account` | 账户信息（余额、保证金、净值） |
-| `hyperliquid-book` | 订单簿深度 |
 | `hyperliquid-orders` | 查看挂单列表 |
 | `hyperliquid-positions` | 查看持仓列表 |
-| `hyperliquid-funding` | 资金费率排行 |
 | `hyperliquid-balance-check` | 交易前余额检查（现货或永续） |
 | `hyperliquid-limit-order` | 挂限价单 |
 | `hyperliquid-market-order` | 下永续合约市价单 |
@@ -544,6 +543,9 @@ AI Agent → hyperliquid-limit-order / hyperliquid-market-order → Hyperliquid 
 | 兑换页面 | 独立 HTML，无后端通信，无 Cookie，无追踪 |
 
 ## 更新日志
+
+### v2.0.6 (2026-06-26)
+- ✅ 行情工具合并——`hyperliquid-price` + `hyperliquid-book` + `hyperliquid-funding` 合并为单个 `hyperliquid-market`，新增 `view` 参数（`price` 默认 / `book` 需 `coin`+`depth?` / `funding` 用 `limit?`+`coin?`）；Hyperliquid 14→12、总数 23→21
 
 ### v2.0.4 (2026-06-15)
 - ✅ MCP 工具名同步改名——14 个永续工具 `hl-*` → `hyperliquid-*`，与线上 MCP 对齐，修复改名后永续调用断引用
