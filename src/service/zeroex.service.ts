@@ -110,7 +110,8 @@ export interface QuoteResult extends PriceResult {
   };
 }
 
-const DEFAULT_TAKER = "0x70a9f34f9b34c64957b9c401a97bfed35b95049e";
+// DEFAULT_TAKER removed: /price endpoint accepts taker as optional;
+// passing a hardcoded non-user address can cause routing errors.
 
 @Injectable()
 export class ZeroExService implements OnModuleInit {
@@ -130,7 +131,7 @@ export class ZeroExService implements OnModuleInit {
       baseURL: "https://api.0x.org/swap/allowance-holder",
       headers: {
         "0x-api-key": this.cfg.zeroExApiKey,
-        "0x-version": "v2",
+        "0x-version": "2",
         Accept: "application/json",
       },
       timeout: 15_000,
@@ -154,7 +155,7 @@ export class ZeroExService implements OnModuleInit {
         sellToken: sell.address,
         buyToken: buy.address,
         sellAmount: sellWei,
-        taker: taker ?? DEFAULT_TAKER,
+        ...(taker ? { taker } : {}),
       },
     });
 
@@ -205,7 +206,6 @@ export class ZeroExService implements OnModuleInit {
         sellToken: TOKENS.USDC.address,
         buyToken: TOKENS.WETH.address,
         sellAmount: "1000000",
-        taker: DEFAULT_TAKER,
       },
     });
     const gpWei = Number(data.gasPrice ?? 0);
